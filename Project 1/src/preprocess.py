@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import os
+import math
 
 class Data:
     def __init__(self):
@@ -36,8 +37,7 @@ class Data:
             print("num classes: ", num_classes)
             print("classes: " , classes)
             print("num features: ", num_features)
-            print("num lines: ", num_lines)
-            print("class map: ", self.class_map)
+            print("num entries: ", num_lines)
 
         file.close()
 
@@ -55,13 +55,10 @@ class Data:
 
                 line_count += 1
 
-            print(data)
 
             for i in range(num_features):
                 averages[i] /= num_lines
                 averages[i] = round(averages[i], 2)
-
-            print("averages: ", averages)
 
             self.num_classes = num_classes
             self.classes = classes
@@ -80,6 +77,7 @@ class Data:
         print("name: ", self.name)
 
     def bin(self):
+        print("binning data...")
         # Step 1: Create an array of arrays for each feature
         feature_arrays = [[] for _ in range(self.num_features)]
 
@@ -87,8 +85,6 @@ class Data:
         for entry in self.raw_data:
             for i in range(len(entry)):
                 feature_arrays[i].append(entry[i])
-
-        print("Feature Arrays: ", feature_arrays)
 
         # Step 2: Calculate the quartiles for each feature
         quartiles = []
@@ -100,13 +96,9 @@ class Data:
 
             quartiles.append((q1, q2, q3, q4))
 
-        print("Quartiles: ", quartiles)
-
         # Step 3: Assign each entry to a quartile
         binned_data = []
         entry_num = 0
-
-        print("class map size: ", len(self.class_map))
 
         for entry in self.raw_data:
             binned_entry = []
@@ -127,10 +119,10 @@ class Data:
             binned_data.append(binned_entry)
             entry_num += 1
 
-        print("Binned Data:", binned_data)
         self.binned_data = binned_data
 
     def shuffle(self):
+        print("shuffling data entries...")
         # Make a copy of the original list to avoid modifying it
         shuffled_array = self.binned_data[:]
 
@@ -139,9 +131,8 @@ class Data:
 
         self.shuffled_data = shuffled_array
 
-        print("Shuffled data: ", self.shuffled_data)
-
     def write_data_to_file(self):
+        print("writing preprocessed data to file...")
         filename = self.name + "_processed.data"
 
         current_dir = os.path.dirname(__file__)  # Gets the directory of the current file (src folder)
@@ -156,33 +147,95 @@ class Data:
                 # Write the line to the file
                 file.write(line + '\n')
 
+    def add_noise(self):
+        print("adding noise...")
+        noise_array = self.shuffled_data[:]
+        amount_of_noise = math.ceil(.1 * self.num_features)
 
-breast_cancer = Data()
-breast_cancer.process_file("../data/breast-cancer-wisconsin.data")
-breast_cancer.bin()
-breast_cancer.shuffle()
-breast_cancer.write_data_to_file()
-print('\n')
+        print("num features to be shuffled: ", amount_of_noise)
 
-glass = Data()
-glass.process_file("../data/glass.data")
-glass.bin()
-glass.shuffle()
-glass.write_data_to_file()
-print('\n')
+        already_done_features = []
 
-soybean = Data()
-soybean.process_file("../data/soybean-small.data")
-soybean.bin()
-soybean.shuffle()
-soybean.write_data_to_file()
-print('\n')
+        for i in range(amount_of_noise):
+            feature_num = random.randint(0, self.num_features - 1)
 
-iris = Data()
-iris.process_file("../data/iris.data")
-iris.bin()
-iris.shuffle()
-iris.write_data_to_file()
-print('\n')
+            if feature_num not in already_done_features:
+                already_done_features.append(feature_num)
 
+                print("feature to be shuffled:", feature_num)
+
+                num_shuffles = 0
+                already_shuffled_data = []
+                while num_shuffles <= self.num_entries:
+                    entry_1_index = random.randint(0, self.num_entries - 1)
+                    entry_2_index = random.randint(0, self.num_entries - 1)
+
+                    if (entry_1_index not in already_shuffled_data and
+                            entry_2_index not in already_shuffled_data):
+                        entry_1 = noise_array[entry_1_index][feature_num]
+                        entry_2 = noise_array[entry_2_index][feature_num]
+
+                        noise_array[entry_1_index][feature_num] = entry_2
+                        noise_array[entry_2_index][feature_num] = entry_1
+                        already_shuffled_data.append(entry_1_index)
+                        already_shuffled_data.append(entry_2_index)
+
+                        num_shuffles += 2
+            else:
+                i -= 1
+                print("feature already shuffled")
+
+        print(noise_array)
+        print(self.shuffled_data)
+
+        print("writing noisy data to file...")
+
+        filename = self.name + "_noisy.data"
+
+        current_dir = os.path.dirname(__file__)  # Gets the directory of the current file (src folder)
+        data_folder = os.path.join(current_dir, '..', 'data')  # Navigate up one level and into the data folder
+        os.makedirs(data_folder, exist_ok=True)
+        file_path = os.path.join(data_folder, filename)
+
+        with open(file_path, 'w') as file:
+            for entry in noise_array:
+                # Convert each sub-array to a string with values separated by spaces
+                line = ','.join(map(str, entry))
+                # Write the line to the file
+                file.write(line + '\n')
+
+def main():
+    breast_cancer = Data()
+    breast_cancer.process_file("../data/breast-cancer-wisconsin.data")
+    breast_cancer.bin()
+    breast_cancer.shuffle()
+    breast_cancer.write_data_to_file()
+    breast_cancer.add_noise()
+    print('\n')
+
+    glass = Data()
+    glass.process_file("../data/glass.data")
+    glass.bin()
+    glass.shuffle()
+    glass.write_data_to_file()
+    glass.add_noise()
+    print('\n')
+
+    soybean = Data()
+    soybean.process_file("../data/soybean-small.data")
+    soybean.bin()
+    soybean.shuffle()
+    soybean.write_data_to_file()
+    soybean.add_noise()
+    print('\n')
+
+    iris = Data()
+    iris.process_file("../data/iris.data")
+    iris.bin()
+    iris.shuffle()
+    iris.write_data_to_file()
+    iris.add_noise()
+    print('\n')
+
+# main()
 
