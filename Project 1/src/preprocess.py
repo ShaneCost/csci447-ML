@@ -105,6 +105,9 @@ class Data:
         # Step 3: Assign each entry to a quartile
         binned_data = []
         entry_num = 0
+
+        print("class map size: ", len(self.class_map))
+
         for entry in self.raw_data:
             binned_entry = []
             for i in range(len(entry)):
@@ -173,6 +176,13 @@ soybean.process_file("../data/soybean-small.data")
 soybean.bin()
 soybean.shuffle()
 soybean.write_data_to_file()
+print('\n')
+
+iris = Data()
+iris.process_file("../data/iris.data")
+iris.bin()
+iris.shuffle()
+iris.write_data_to_file()
 print('\n')
 
 
