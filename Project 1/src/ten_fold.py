@@ -119,7 +119,7 @@ class TenFold:
         Provides the fold equivalent to the current test set
 
         :param test_set_num: number value of test set to be returned
-        :return: 2D array containing the fold containing the test data set
+        :return: 2D array containing the fold of the test data set
         """
         if test_set_num == 1:
             return self.fold_1
