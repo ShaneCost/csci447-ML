@@ -82,40 +82,103 @@ class TenFold:
         self.fold_9 = folds[8]
         self.fold_10 = folds[9]
 
+    def get_training_set(self, test_set_num):
+        """
+        Creates a training data set based on which fold is your current test set
+
+        :param test_set_num: number value of test set to be excluded from training
+        :return: 3D array containing all folds in the training data set
+        """
+        training_data = []
+
+        if test_set_num != 1:
+            training_data.append(self.fold_1)
+        if test_set_num != 2:
+            training_data.append(self.fold_2)
+        if test_set_num != 3:
+            training_data.append(self.fold_3)
+        if test_set_num != 4:
+            training_data.append(self.fold_4)
+        if test_set_num != 5:
+            training_data.append(self.fold_5)
+        if test_set_num != 6:
+            training_data.append(self.fold_6)
+        if test_set_num != 7:
+            training_data.append(self.fold_7)
+        if test_set_num != 8:
+            training_data.append(self.fold_8)
+        if test_set_num != 9:
+            training_data.append(self.fold_9)
+        if test_set_num != 10:
+            training_data.append(self.fold_10)
+
+        return training_data
+
+    def get_test_set(self, test_set_num):
+        """
+        Provides the fold equivalent to the current test set
+
+        :param test_set_num: number value of test set to be returned
+        :return: 2D array containing the fold containing the test data set
+        """
+
+        if test_set_num == 1:
+            return self.fold_1
+        elif test_set_num == 2:
+            return self.fold_2
+        elif test_set_num == 3:
+            return self.fold_3
+        elif test_set_num == 4:
+            return self.fold_4
+        elif test_set_num == 5:
+            return self.fold_5
+        elif test_set_num == 6:
+            return self.fold_6
+        elif test_set_num == 7:
+            return self.fold_7
+        elif test_set_num == 8:
+            return self.fold_8
+        elif test_set_num == 9:
+            return self.fold_9
+        elif test_set_num == 10:
+            return self.fold_10
+
 def main():
     """
-    Demonstration of how to instantiate class
+    Demonstration of how to instantiate and use class
 
     :return: None
     """
     breast_cancer = TenFold()
-    breast_cancer.load("../data/breast-cancer-wisconsin_processed.data")
+    breast_cancer.load("../data/processed_data/breast-cancer-wisconsin_processed.data")
+    print(breast_cancer.get_test_set(10))
+    print(breast_cancer.get_training_set(10))
 
     glass = TenFold()
-    glass.load("../data/glass_processed.data")
+    glass.load("../data/processed_data/glass_processed.data")
 
     soybean = TenFold()
-    soybean.load("../data/soybean-small_processed.data")
+    soybean.load("../data/processed_data/soybean-small_processed.data")
 
     iris = TenFold()
-    iris.load("../data/iris_processed.data")
+    iris.load("../data/processed_data/iris_processed.data")
 
     votes = TenFold()
-    votes.load("../data/house-votes-84_processed.data")
+    votes.load("../data/processed_data/house-votes-84_processed.data")
 
     breast_cancer_noisy = TenFold()
-    breast_cancer_noisy.load("../data/breast-cancer-wisconsin_noisy.data")
+    breast_cancer_noisy.load("../data/noisy_data/breast-cancer-wisconsin_noisy.data")
 
     glass_noisy = TenFold()
-    glass_noisy.load("../data/glass_noisy.data")
+    glass_noisy.load("../data/noisy_data/glass_noisy.data")
 
     soybean_noisy = TenFold()
-    soybean_noisy.load("../data/soybean-small_noisy.data")
+    soybean_noisy.load("../data/noisy_data/soybean-small_noisy.data")
 
     iris_noisy = TenFold()
-    iris_noisy.load("../data/iris_noisy.data")
+    iris_noisy.load("../data/noisy_data/iris_noisy.data")
 
     votes_noisy = TenFold()
-    votes_noisy.load("../data/house-votes-84_noisy.data")
+    votes_noisy.load("../data/noisy_data/house-votes-84_noisy.data")
 
 main()
