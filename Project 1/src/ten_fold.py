@@ -87,30 +87,30 @@ class TenFold:
         Creates a training data set based on which fold is your current test set
 
         :param test_set_num: number value of test set to be excluded from training
-        :return: 3D array containing all folds in the training data set
+        :return: 2D array containing all folds in the training data set
         """
         training_data = []
 
         if test_set_num != 1:
-            training_data.append(self.fold_1)
+            training_data.extend(self.fold_1)
         if test_set_num != 2:
-            training_data.append(self.fold_2)
+            training_data.extend(self.fold_2)
         if test_set_num != 3:
-            training_data.append(self.fold_3)
+            training_data.extend(self.fold_3)
         if test_set_num != 4:
-            training_data.append(self.fold_4)
+            training_data.extend(self.fold_4)
         if test_set_num != 5:
-            training_data.append(self.fold_5)
+            training_data.extend(self.fold_5)
         if test_set_num != 6:
-            training_data.append(self.fold_6)
+            training_data.extend(self.fold_6)
         if test_set_num != 7:
-            training_data.append(self.fold_7)
+            training_data.extend(self.fold_7)
         if test_set_num != 8:
-            training_data.append(self.fold_8)
+            training_data.extend(self.fold_8)
         if test_set_num != 9:
-            training_data.append(self.fold_9)
+            training_data.extend(self.fold_9)
         if test_set_num != 10:
-            training_data.append(self.fold_10)
+            training_data.extend(self.fold_10)
 
         return training_data
 
@@ -121,7 +121,6 @@ class TenFold:
         :param test_set_num: number value of test set to be returned
         :return: 2D array containing the fold containing the test data set
         """
-
         if test_set_num == 1:
             return self.fold_1
         elif test_set_num == 2:
@@ -151,8 +150,6 @@ def main():
     """
     breast_cancer = TenFold()
     breast_cancer.load("../data/processed_data/breast-cancer-wisconsin_processed.data")
-    print(breast_cancer.get_test_set(10))
-    print(breast_cancer.get_training_set(10))
 
     glass = TenFold()
     glass.load("../data/processed_data/glass_processed.data")
