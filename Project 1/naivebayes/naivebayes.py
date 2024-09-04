@@ -67,21 +67,22 @@ class NaiveBayesClassifier:
                     column_feature_counts[column_index] = feature_counts
                     column_feature_count_by_class[column_index] = feature_counts_by_class
 
+                    # Stores list of every uniqe class
                     classes = list(set(row[-1] for row in self.training_data))
-
-
-            print(classes)
-                
-
-
-            # print(column_feature_count_by_class)
-            # print(column_feature_counts)
-
             
+            # Goes throught column, class, and featue and divides each classes # of features by the total # of that feature
+            for column in range(0,len(column_feature_count_by_class)):
+                for class_label in classes:
+                    class_features = column_feature_count_by_class[column][class_label] 
+                    for feature in class_features:
+                        column_feature_count_by_class[column][class_label][feature] = column_feature_count_by_class[column][class_label][feature] / column_feature_counts[column][feature]
 
+            return column_feature_count_by_class
 
 def main():
-    classifier = NaiveBayesClassifier('./preprocessed_data/soybean-small_processed.data', './data/soybean-small.data')
+    data_file = "Project 1\data\processed_data\soybean-small_processed.data"
+
+    classifier = NaiveBayesClassifier(data_file, data_file)
     classifier.import_training()
     classifier.import_testing()
     
