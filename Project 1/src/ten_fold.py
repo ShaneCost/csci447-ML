@@ -181,4 +181,4 @@ def main():
     votes_noisy = TenFold()
     votes_noisy.load("../data/noisy_data/house-votes-84_noisy.data")
 
-main()
+# main()
