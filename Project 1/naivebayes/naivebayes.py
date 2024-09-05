@@ -31,7 +31,7 @@ class NaiveBayesClassifier:
         # Creates probability table as a dictinary
         def generate_probability_table(self):
             
-            # Dictinary for number of uniqe features dependong on (column) and (column by class)
+            # Dictionary for number of unique features depending on (column) and (column by class)
             column_feature_counts = {}
             column_feature_count_by_class = {}
 
@@ -80,7 +80,7 @@ class NaiveBayesClassifier:
             return column_feature_count_by_class
 
 def main():
-    data_file = "Project 1\data\processed_data\soybean-small_processed.data"
+    data_file = "../data/processed_data/soybean-small_processed.data"
 
     classifier = NaiveBayesClassifier(data_file, data_file)
     classifier.import_training()
@@ -88,7 +88,7 @@ def main():
     
     # Instantiate ProbabilityTable with the training data
     pt = NaiveBayesClassifier.ProbabilityTable(classifier.training_data)
-    pt.generate_probability_table()
+    print(pt.generate_probability_table())
 
 if __name__ == "__main__":
     main()
