@@ -70,25 +70,34 @@ class NaiveBayesClassifier:
 
         for class_name in feature_counts:
             for feature in range(num_features):
-                q1 = feature_counts[class_name][feature].pop('q1')
-                q2 = feature_counts[class_name][feature].pop('q2')
-                q3 = feature_counts[class_name][feature].pop('q3')
-                q4 = feature_counts[class_name][feature].pop('q4')
+                counts = {}
+                denominator = 0
+                for value in possible_values:
+                    count = feature_counts[class_name][feature].pop(value)
+                    counts[value] = count
+                    denominator += count
 
-                # print(q1, q2, q3, q4)
+                for value in counts:
+                    feature_probabilities[class_name][feature][value] = counts[value] / denominator
 
-                sum = q1 + q2 + q3 + q4
-
-                feature_probabilities[class_name][feature]['q1'] = q1/sum
-                feature_probabilities[class_name][feature]['q2'] = q2/sum
-                feature_probabilities[class_name][feature]['q3'] = q3/sum
-                feature_probabilities[class_name][feature]['q4'] = q4/sum
-
-        print(feature_probabilities)
         self.probability_table = feature_probabilities
 
     def classify(self, row):
-        print(row)
+        propability_class = {}  # Dic where each class will be assigmened a probability that the row is that class
+        for class_name in self.class_probabilities:
+            propability_value = 1
+
+            for i, feature in enumerate(row[
+                                        :-1]):  # Get propability of each class dependent on the column and feature and * together
+                propability_value *= self.probability_table[class_name][i][feature]
+
+            propability_class[class_name] = propability_value
+
+        return propability_class
+
+    @staticmethod
+    def arg_max(dictionary):
+        return max(dictionary, key=dictionary.get)
 
 def main():
     soy = TenFold()
@@ -104,8 +113,21 @@ def main():
         classifier = NaiveBayesClassifier(soy_training, soy_testing)
         classifier.train()
 
+        # Test classifier accaccuracy
+        accaccuracy = 0.0
+        correct = 0
+        total = 0
+
         for row in soy_testing:
-            classifier.classify(row)
+            prediction = classifier.classify(row)
+
+            if classifier.arg_max(prediction) == row[-1]:
+                correct += 1
+            total += 1
+
+        accaccuracy = correct / total
+
+        print(accaccuracy)
 
 
 main()
