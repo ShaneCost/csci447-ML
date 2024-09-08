@@ -76,24 +76,29 @@ class NaiveBayesClassifier:
 
         # print(feature_counts)
 
+        # get all the uniqe features from feature_counts
+        unique_features = set()
+
+        for outer_key in feature_counts:
+            for inner_key in feature_counts[outer_key]:
+                unique_features.update(feature_counts[outer_key][inner_key].keys())
+
+        # Ensure unique_features is a sorted list
+        unique_features = list(unique_features)
+        unique_features.sort()
+
         for class_name in feature_counts:
             for feature in range(num_features):
-                q1 = feature_counts[class_name][feature].pop('q1')
-                q2 = feature_counts[class_name][feature].pop('q2')
-                q3 = feature_counts[class_name][feature].pop('q3')
-                q4 = feature_counts[class_name][feature].pop('q4')
+                sum_counts = 0  
+                
+                # Iterate over each unique feature
+                for unique_feature in unique_features:
+                    q = feature_counts[class_name][feature].get(unique_feature, 0)
+                    sum_counts += q
+                    feature_probabilities[class_name][feature][unique_feature] = q
 
-                # print(q1, q2, q3, q4)
-
-                sum = q1 + q2 + q3 + q4
-
-                feature_probabilities[class_name][feature]['q1'] = q1/sum
-                feature_probabilities[class_name][feature]['q2'] = q2/sum
-                feature_probabilities[class_name][feature]['q3'] = q3/sum
-                feature_probabilities[class_name][feature]['q4'] = q4/sum
-
-        # print(feature_probabilities)
         self.probability_table = feature_probabilities
+
 
     def classify(self, row):
 
@@ -116,7 +121,7 @@ class NaiveBayesClassifier:
 def main():
     soy = TenFold()
 
-    soy.load("Project 1\data\processed_data\iris_processed.data")
+    soy.load("Project 1\data\processed_data\house-votes-84_processed.data")
 
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
