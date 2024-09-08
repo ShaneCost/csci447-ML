@@ -34,7 +34,15 @@ class NaiveBayesClassifier:
 
         self.class_probabilities = class_probabilities
 
-        possible_values = ['q1', 'q2', 'q3', 'q4']
+        # get all possible values for
+        possible_values = []
+        for row in self.training_data:
+            for i in range(len(row) - 1):
+                value = row[i]
+                if value not in possible_values:
+                    possible_values.append(value)
+
+        
 
         # Initialize counts table with all 1's for all possible values
         for feature in range(num_features):
@@ -55,7 +63,7 @@ class NaiveBayesClassifier:
                         for feature_value_1 in possible_values:
                             feature_counts[class_name][feature][feature_value_1] = 1
                             feature_probabilities[class_name][feature][feature_value_1] = 0
-            print('\n')
+            # print('\n')
 
         # print(feature_counts)
 
@@ -84,16 +92,31 @@ class NaiveBayesClassifier:
                 feature_probabilities[class_name][feature]['q3'] = q3/sum
                 feature_probabilities[class_name][feature]['q4'] = q4/sum
 
-        print(feature_probabilities)
+        # print(feature_probabilities)
         self.probability_table = feature_probabilities
 
     def classify(self, row):
-        print(row)
+
+        propability_class = {} # Dic where each class will be assigmened a probability that the row is that class
+        for class_name in self.class_probabilities:
+            propability_value = 1
+            
+            for i, feature in enumerate (row[:-1]): # Get propability of each class dependent on the column and feature and * together             
+                propability_value *= self.probability_table[class_name][i][feature]
+
+            propability_class[class_name] = propability_value
+
+
+        
+        return propability_class
+            
+        
+
 
 def main():
     soy = TenFold()
 
-    soy.load("../data/processed_data/iris_processed.data")
+    soy.load("Project 1\data\processed_data\iris_processed.data")
 
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
