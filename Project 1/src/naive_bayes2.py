@@ -105,14 +105,14 @@ class NaiveBayesClassifier:
                 propability_value *= self.probability_table[class_name][i][feature]
 
             propability_class[class_name] = propability_value
-
-
         
-        return propability_class
-            
+        return propability_class 
+
+    @staticmethod
+    def arg_max(dictionary):
+        return max(dictionary, key=dictionary.get)
         
-
-
+        
 def main():
     soy = TenFold()
 
@@ -127,8 +127,22 @@ def main():
         classifier = NaiveBayesClassifier(soy_training, soy_testing)
         classifier.train()
 
-        for row in soy_testing:
-            classifier.classify(row)
+        # Test classifier accaccuracy
+        accaccuracy = 0.0
+        correct = 0
+        total = 0
 
+        for row in soy_testing:
+            prediction = classifier.classify(row)
+            
+            if(classifier.arg_max(prediction) == row[-1]):
+                correct +=1
+            total +=1
+
+        accaccuracy = correct/total
+
+    print(accaccuracy)
+            
+            
 
 main()
