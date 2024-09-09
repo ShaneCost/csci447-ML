@@ -1,10 +1,12 @@
-__author__ = "<Hayden Perusich>"
-
+# Hayden and Shane's implimentation of Naive Bayes Classifier
 class NaiveBayesClassifier:
     def __init__(self, training_data, testing_data):
+
+        # Get training and testing data as 2d array
         self.training_data = training_data
         self.testing_data = testing_data
 
+        # Generate dictinaries for propability table
         self.class_probabilities = {}
         self.probability_table = {}
 
@@ -14,8 +16,8 @@ class NaiveBayesClassifier:
         class_counts = {}
         class_probabilities = {}
 
-        feature_counts = {}
-        feature_probabilities = {}
+        feature_counts = {} # Will include number of unique features per column 
+        feature_probabilities = {} # Will include number of uniqe features per class per column
 
         num_features = 0
 
@@ -34,7 +36,7 @@ class NaiveBayesClassifier:
 
         self.class_probabilities = class_probabilities
 
-        # get all possible values for
+        # get all possible values for each feature
         possible_values = []
         for row in self.training_data:
             for i in range(len(row) - 1):
@@ -42,11 +44,14 @@ class NaiveBayesClassifier:
                 if value not in possible_values:
                     possible_values.append(value)
 
-        # Initialize counts table with all 1's for all possible values
+        # Initialize counts dictinary with all 1's for all possible values
+        # for loops will initialize feature_probabilities and feature_counts
         for feature in range(num_features):
             for class_name in class_counts:
                 for row in self.training_data:
                     if row[-1] == class_name:
+                        feature_value = row[feature]
+                        # print(feature, ": ", feature_value, " class: ", class_name)
 
                         if class_name not in feature_counts:
                             feature_counts[class_name] = {}
@@ -59,7 +64,9 @@ class NaiveBayesClassifier:
                         for feature_value_1 in possible_values:
                             feature_counts[class_name][feature][feature_value_1] = 1
                             feature_probabilities[class_name][feature][feature_value_1] = 0
+            # print('\n')
 
+        # add all the number of features per class_name per column to feature_counts
         for feature in range(num_features):
             for class_name in class_counts:
                 for row in self.training_data:
@@ -67,6 +74,9 @@ class NaiveBayesClassifier:
                         feature_value = row[feature]
                         feature_counts[class_name][feature][feature_value] += 1
 
+        # print(feature_counts)
+
+        # Use feature_counts to find total number of features
         for class_name in feature_counts:
             for feature in range(num_features):
                 counts = {}
@@ -76,24 +86,28 @@ class NaiveBayesClassifier:
                     counts[value] = count
                     denominator += count
 
+                # Divide number of features by total number of features to get percentage 
                 for value in counts:
                     feature_probabilities[class_name][feature][value] = counts[value] / denominator
 
         self.probability_table = feature_probabilities
 
     def classify(self, row):
-
-        probability_class = {} # Dic where each class will be assigned a probability that the row is that class
+        
+        # Dic where each class will be assigmened a probability that the row is that class
+        propability_class = {} 
         for class_name in self.class_probabilities:
-            probability_value = 1
-            
-            for i, feature in enumerate (row[:-1]): # Get probability of each class dependent on the column and feature and * together
-                probability_value *= self.probability_table[class_name][i][feature]
+            propability_value = 1
 
-            probability_value *= self.class_probabilities[class_name]
-            probability_class[class_name] = probability_value
+             # Get propability of each class dependent on the column and feature and * together  
+            for i, feature in enumerate (row[:-1]):           
+                propability_value *= self.probability_table[class_name][i][feature]
 
-        return probability_class
+            # multiply propability_value by probability of that class
+            propability_value *= self.class_probabilities[class_name]
+            propability_class[class_name] = propability_value
+
+        return propability_class 
 
     @staticmethod
     def arg_max(dictionary):
