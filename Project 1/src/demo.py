@@ -52,8 +52,4 @@ def main():
     print(clean_scores)
     print(noisy_scores)
 
-
-
-
-
 main()

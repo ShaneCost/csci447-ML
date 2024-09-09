@@ -83,42 +83,44 @@ class Data:
                 file.write(line + '\n')
 
     def add_noise(self):
-        noise_array = self.shuffled_data[:]
-        amount_of_noise = math.ceil(0.1 * self.num_features)
+        noise_array = self.shuffled_data[:]  # Make a copy of the original list to avoid modifying it
 
+        amount_of_noise = math.ceil(.1 * self.num_entries)  # Calculate the number of features to be shuffled
         print("num features to be shuffled: ", amount_of_noise)
 
-        already_done_features = set()
+        for i in range(self.num_features):
+            num_shuffles = 0
+            already_shuffled_data = []
+            while num_shuffles <= amount_of_noise:  # Iterate until every datapoint has been shuffled
+                # Randomly generate 2 indexes
+                entry_1_index = random.randint(0, self.num_entries - 1)
+                entry_2_index = random.randint(0, self.num_entries - 1)
 
-        for _ in range(amount_of_noise):
-            feature_num = random.randint(0, self.num_features - 1)
+                # Ensure indexes have not already been selected
+                if (entry_1_index not in already_shuffled_data and
+                        entry_2_index not in already_shuffled_data):
+                    # Retrieve value of feature at the generate index
+                    entry_1 = noise_array[entry_1_index][i]
+                    entry_2 = noise_array[entry_2_index][i]
 
-            if feature_num not in already_done_features:
-                already_done_features.add(feature_num)
-                print("feature to be shuffled:", feature_num)
+                    # Shuffle values
+                    noise_array[entry_1_index][i] = entry_2
+                    noise_array[entry_2_index][i] = entry_1
+                    already_shuffled_data.append(entry_1_index)
+                    already_shuffled_data.append(entry_2_index)
 
-                indices = list(range(self.num_entries))
-                random.shuffle(indices)
-                for i in range(0, len(indices), 2):
-                    if i + 1 < len(indices):
-                        entry_1_index = indices[i]
-                        entry_2_index = indices[i + 1]
+                    # Increment twice for shuffling two data points
+                    num_shuffles += 2
 
-                        entry_1 = noise_array[entry_1_index][feature_num]
-                        entry_2 = noise_array[entry_2_index][feature_num]
+        # Write noisy data to a .data file
+        print("writing noisy data to file...")
 
-                        noise_array[entry_1_index][feature_num] = entry_2
-                        noise_array[entry_2_index][feature_num] = entry_1
-            else:
-                print("feature already shuffled")
-
-        self._write_noise_file(noise_array)
-
-    def _write_noise_file(self, noise_array):
-        print(noise_array)
-        print(self.shuffled_data)
         filename = self.name + "_noisy.data"
-        file_path = os.path.join(os.path.dirname(__file__), '..', 'data', filename)
+
+        current_dir = os.path.dirname(__file__)
+        data_folder = os.path.join(current_dir, '..', 'data')
+        os.makedirs(data_folder, exist_ok=True)
+        file_path = os.path.join(data_folder, filename)
 
         with open(file_path, 'w') as file:
             for entry in noise_array:
@@ -127,9 +129,9 @@ class Data:
 
 def main():
     votes = Data()
-    votes.process_file("../data/house-votes-84.data")
+    votes.process_file("../data/raw_data/house-votes-84.data")
     votes.shuffle()
     votes.write_data_to_file()
     votes.add_noise()
 
-# main()
+main()
