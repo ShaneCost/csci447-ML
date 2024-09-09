@@ -1,5 +1,5 @@
 from ten_fold import TenFold
-from naive_bayes2 import NaiveBayesClassifier
+from naive_bayes import NaiveBayesClassifier
 from confusion_matrix import ConfusionMatrix
 
 def run(file_path):
