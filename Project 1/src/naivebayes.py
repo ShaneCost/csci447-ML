@@ -80,7 +80,7 @@ class NaiveBayesClassifier:
                 for class_label in classes:
                     class_features = column_feature_count_by_class[column][class_label] 
                     for feature in class_features:
-                        column_feature_count_by_class[column][class_label][feature] = column_feature_count_by_class[column][class_label][feature] / column_feature_counts[column][feature]
+                        column_feature_count_by_class[column][class_label][feature] = (column_feature_count_by_class[column][class_label][feature]) / (column_feature_counts[column][feature])
 
 
             # Column_features_count_by_class now contains the propability that each column and features belongs to that class
@@ -90,17 +90,19 @@ class NaiveBayesClassifier:
 def main():
 
     soy = TenFold()
-    soy.load("Project 1\data\processed_data\soybean-small_processed.data")
+    soy.load("Project 1\data\processed_data\iris_processed.data")
 
-    for i in range(1,11):
-        soy_training = soy.get_training_set(i)
-        soy_testing = soy.get_test_set(i)
+    # for i in range(1,11):
 
-        classifier = NaiveBayesClassifier(soy_training, soy_testing)
+    soy_training = soy.get_training_set(1)
+    soy_testing = soy.get_test_set(1)
 
-        # Instantiate ProbabilityTable with the training data
-        pt = NaiveBayesClassifier.ProbabilityTable(classifier.training_data)
-        data = pt.generate_probability_table()
+    classifier = NaiveBayesClassifier(soy_training, soy_testing)
+
+    # Instantiate ProbabilityTable with the training data
+    pt = NaiveBayesClassifier.ProbabilityTable(classifier.training_data)
+    data = pt.generate_probability_table()
+    print(data[0])
 
 
 if __name__ == "__main__":
