@@ -76,31 +76,21 @@ class NaiveBayesClassifier:
 
         # print(feature_counts)
 
-        # get all the unique features from feature_counts
-        unique_features = set()
-
-        for outer_key in feature_counts:
-            for inner_key in feature_counts[outer_key]:
-                unique_features.update(feature_counts[outer_key][inner_key].keys())
-
-        # Ensure unique_features is a sorted list
-        unique_features = list(unique_features)
-        unique_features.sort()
-
         for class_name in feature_counts:
             for feature in range(num_features):
-                sum_counts = 0
-                # Iterate over each unique feature
-                for unique_feature in unique_features:
-                    q = feature_counts[class_name][feature].get(unique_feature, 0)
-                    sum_counts += q
-                    feature_probabilities[class_name][feature][unique_feature] = q
+                counts = {}
+                denominator = 0
+                for value in possible_values:
+                    count = feature_counts[class_name][feature].pop(value)
+                    counts[value] = count
+                    denominator += count
+
+                for value in counts:
+                    feature_probabilities[class_name][feature][value] = counts[value] / denominator
 
         self.probability_table = feature_probabilities
 
         print(self.probability_table)
-        print(unique_features)
-        print(feature_counts, '\n')
 
 
     def classify(self, row):
