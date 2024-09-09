@@ -76,7 +76,7 @@ class NaiveBayesClassifier:
 
         # print(feature_counts)
 
-        # get all the uniqe features from feature_counts
+        # get all the unique features from feature_counts
         unique_features = set()
 
         for outer_key in feature_counts:
@@ -89,8 +89,7 @@ class NaiveBayesClassifier:
 
         for class_name in feature_counts:
             for feature in range(num_features):
-                sum_counts = 0  
-                
+                sum_counts = 0
                 # Iterate over each unique feature
                 for unique_feature in unique_features:
                     q = feature_counts[class_name][feature].get(unique_feature, 0)
@@ -98,6 +97,10 @@ class NaiveBayesClassifier:
                     feature_probabilities[class_name][feature][unique_feature] = q
 
         self.probability_table = feature_probabilities
+
+        print(self.probability_table)
+        print(unique_features)
+        print(feature_counts, '\n')
 
 
     def classify(self, row):
@@ -110,7 +113,7 @@ class NaiveBayesClassifier:
                 propability_value *= self.probability_table[class_name][i][feature]
 
             propability_class[class_name] = propability_value
-        
+
         return propability_class 
 
     @staticmethod
@@ -118,36 +121,36 @@ class NaiveBayesClassifier:
         return max(dictionary, key=dictionary.get)
         
         
-def main():
-    soy = TenFold()
-
-    soy.load("Project 1\data\processed_data\house-votes-84_processed.data")
-
-    folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-
-    for fold in folds:
-        soy_training = soy.get_training_set(fold)
-        soy_testing = soy.get_test_set(fold)
-
-        classifier = NaiveBayesClassifier(soy_training, soy_testing)
-        classifier.train()
-
-        # Test classifier accaccuracy
-        accaccuracy = 0.0
-        correct = 0
-        total = 0
-
-        for row in soy_testing:
-            prediction = classifier.classify(row)
-            
-            if(classifier.arg_max(prediction) == row[-1]):
-                correct +=1
-            total +=1
-
-        accaccuracy = correct/total
-
-    print(accaccuracy)
-            
-            
-
-main()
+# def main():
+#     soy = TenFold()
+#
+#     soy.load("Project 1\data\processed_data\house-votes-84_processed.data")
+#
+#     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+#
+#     for fold in folds:
+#         soy_training = soy.get_training_set(fold)
+#         soy_testing = soy.get_test_set(fold)
+#
+#         classifier = NaiveBayesClassifier(soy_training, soy_testing)
+#         classifier.train()
+#
+#         # Test classifier accaccuracy
+#         accaccuracy = 0.0
+#         correct = 0
+#         total = 0
+#
+#         for row in soy_testing:
+#             prediction = classifier.classify(row)
+#
+#             if(classifier.arg_max(prediction) == row[-1]):
+#                 correct +=1
+#             total +=1
+#
+#         accaccuracy = correct/total
+#
+#     print(accaccuracy)
+#
+#
+#
+# main()
