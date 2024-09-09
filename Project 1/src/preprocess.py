@@ -1,3 +1,5 @@
+__author__ = "<Shane Costello>"
+
 import numpy as np
 import random
 import os

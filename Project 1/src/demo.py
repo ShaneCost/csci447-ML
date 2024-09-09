@@ -1,3 +1,5 @@
+__author__ = "<Shane Costello>"
+
 from ten_fold import TenFold
 from naive_bayes import NaiveBayesClassifier
 from confusion_matrix import ConfusionMatrix
