@@ -189,7 +189,7 @@ class Data:
     def add_noise(self):
         """
         Takes preprocessed data and adds noise to data set.
-        Noise is defined as randomly selecting 10% of features and shuffling values inside the chosen feature.
+        Noise is defined as randomly selecting 10% of values for each feature and shuffling them .
 
         :return: None
         """
@@ -197,18 +197,18 @@ class Data:
 
         noise_array = self.shuffled_data[:] # Make a copy of the original list to avoid modifying it
 
-        amount_of_noise = math.ceil(.1 * self.num_entries) # Calculate the number of features to be shuffled
-        print("num features to be shuffled: ", amount_of_noise)
+        amount_of_noise = math.ceil(.1 * self.num_entries) # Calculate the number of values that will be shuffled in each feature
+        print("num values to be shuffled: ", amount_of_noise)
 
-        for i in range(self.num_features):
+        for i in range(self.num_features): # iterate through each feature
                 num_shuffles = 0
-                already_shuffled_data = []
-                while num_shuffles <= amount_of_noise: # Iterate until every datapoint has been shuffled
-                    # Randomly generate 2 indexes
+                already_shuffled_data = [] # used to track which rows (per feature) have already been shuffled
+                while num_shuffles <= amount_of_noise: # Iterate until 10% of values have been shuffled
+                    # Randomly generate 2 row indexes
                     entry_1_index = random.randint(0, self.num_entries - 1)
                     entry_2_index = random.randint(0, self.num_entries - 1)
 
-                    # Ensure indexes have not already been selected
+                    # Ensure rows have not already been selected (for this feature)
                     if (entry_1_index not in already_shuffled_data and
                             entry_2_index not in already_shuffled_data):
 
