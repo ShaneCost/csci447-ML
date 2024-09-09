@@ -1,3 +1,5 @@
+__author__ = "<Hayden Perusich>"
+
 class NaiveBayesClassifier:
     def __init__(self, training_data, testing_data):
         self.training_data = training_data

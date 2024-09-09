@@ -1,3 +1,5 @@
+__author__ = "<Shane Costello>"
+
 class ConfusionMatrix:
 
     def __init__(self, actual, predicted):

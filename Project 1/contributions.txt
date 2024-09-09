@@ -1,0 +1,9 @@
+Shane Costello
+    - preprocess.py
+    - preprocess_votes.py
+    - confusion_matrix.py
+    - demo.py
+
+Hayden Perusich
+    - naive_bayes.py
+    - ten_fold.py

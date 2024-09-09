@@ -1,3 +1,5 @@
+__author__ = "<Hayden Perusich>"
+
 class TenFold:
 
     def __init__(self):

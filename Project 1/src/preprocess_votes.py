@@ -1,3 +1,5 @@
+__author__ = "<Shane Costello>"
+
 import random
 import os
 import math
