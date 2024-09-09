@@ -1,4 +1,5 @@
-# Hayden and Shane's implimentation of Naive Bayes Classifier
+__author__ = "Hayden Perusich"
+
 class NaiveBayesClassifier:
     def __init__(self, training_data, testing_data):
 
@@ -109,6 +110,7 @@ class NaiveBayesClassifier:
 
         return propability_class 
 
+    # return the class associated with the largest value
     @staticmethod
     def arg_max(dictionary):
         return max(dictionary, key=dictionary.get)
