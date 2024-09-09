@@ -90,9 +90,6 @@ class NaiveBayesClassifier:
 
         self.probability_table = feature_probabilities
 
-        print(self.probability_table)
-
-
     def classify(self, row):
 
         propability_class = {} # Dic where each class will be assigmened a probability that the row is that class
@@ -102,6 +99,7 @@ class NaiveBayesClassifier:
             for i, feature in enumerate (row[:-1]): # Get propability of each class dependent on the column and feature and * together             
                 propability_value *= self.probability_table[class_name][i][feature]
 
+            propability_value *= self.class_probabilities[class_name]
             propability_class[class_name] = propability_value
 
         return propability_class 

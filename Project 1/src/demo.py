@@ -25,6 +25,7 @@ def run(file_path):
             actual_values.append(row[-1])
 
     confusion_matrix = ConfusionMatrix(actual_values, predicted_values)
+    confusion_matrix.print_confusion_matrix()
     return confusion_matrix
 
 def main():

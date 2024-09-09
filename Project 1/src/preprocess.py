@@ -197,21 +197,13 @@ class Data:
 
         noise_array = self.shuffled_data[:] # Make a copy of the original list to avoid modifying it
 
-        amount_of_noise = math.ceil(.1 * self.num_features) # Calculate the number of features to be shuffled
+        amount_of_noise = math.ceil(.1 * self.num_entries) # Calculate the number of features to be shuffled
         print("num features to be shuffled: ", amount_of_noise)
 
-        already_done_features = [] # Used to make sure we are only shuffling a chosen feature once
-
-        for i in range(amount_of_noise):
-            feature_num = random.randint(0, self.num_features - 1) # Randomly generate a feature's index
-
-            if feature_num not in already_done_features: # Ensure feature hasn't already been shuffled
-                already_done_features.append(feature_num) # Add feature index to list of already shuffled features
-                print("feature to be shuffled:", feature_num)
-
+        for i in range(self.num_features):
                 num_shuffles = 0
                 already_shuffled_data = []
-                while num_shuffles <= self.num_entries: # Iterate until every datapoint has been shuffled
+                while num_shuffles <= amount_of_noise: # Iterate until every datapoint has been shuffled
                     # Randomly generate 2 indexes
                     entry_1_index = random.randint(0, self.num_entries - 1)
                     entry_2_index = random.randint(0, self.num_entries - 1)
@@ -221,20 +213,17 @@ class Data:
                             entry_2_index not in already_shuffled_data):
 
                         # Retrieve value of feature at the generate index
-                        entry_1 = noise_array[entry_1_index][feature_num]
-                        entry_2 = noise_array[entry_2_index][feature_num]
+                        entry_1 = noise_array[entry_1_index][i]
+                        entry_2 = noise_array[entry_2_index][i]
 
                         # Shuffle values
-                        noise_array[entry_1_index][feature_num] = entry_2
-                        noise_array[entry_2_index][feature_num] = entry_1
+                        noise_array[entry_1_index][i] = entry_2
+                        noise_array[entry_2_index][i] = entry_1
                         already_shuffled_data.append(entry_1_index)
                         already_shuffled_data.append(entry_2_index)
 
                         # Increment twice for shuffling two data points
                         num_shuffles += 2
-            else:
-                i -= 1
-                print("feature already shuffled")
 
         # Write noisy data to a .data file
         print("writing noisy data to file...")
@@ -258,7 +247,7 @@ def main():
     :return: None
     """
     breast_cancer = Data()
-    breast_cancer.process_file("../data/breast-cancer-wisconsin.data")
+    breast_cancer.process_file("../data/raw_data/breast-cancer-wisconsin.data")
     breast_cancer.bin()
     breast_cancer.shuffle()
     breast_cancer.write_data_to_file()
@@ -266,7 +255,7 @@ def main():
     print('\n')
 
     glass = Data()
-    glass.process_file("../data/glass.data")
+    glass.process_file("../data/raw_data/glass.data")
     glass.bin()
     glass.shuffle()
     glass.write_data_to_file()
@@ -274,7 +263,7 @@ def main():
     print('\n')
 
     soybean = Data()
-    soybean.process_file("../data/soybean-small.data")
+    soybean.process_file("../data/raw_data/soybean-small.data")
     soybean.bin()
     soybean.shuffle()
     soybean.write_data_to_file()
@@ -282,12 +271,12 @@ def main():
     print('\n')
 
     iris = Data()
-    iris.process_file("../data/iris.data")
+    iris.process_file("../data/raw_data/iris.data")
     iris.bin()
     iris.shuffle()
     iris.write_data_to_file()
     iris.add_noise()
     print('\n')
 
-# main()
+main()
 
