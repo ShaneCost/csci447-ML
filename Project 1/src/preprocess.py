@@ -21,6 +21,8 @@ class Data:
         self.binned_data = []
         self.shuffled_data= []
 
+        
+
     def process_file(self, path):
         """
         Reads values from unprocessed data file. Outputs average per feature

@@ -46,25 +46,32 @@ class ConfusionMatrix:
             print(f"{self.classes[i]}: {row}")
 
     def query_matrix(self):
+        """
+        Generate TP, TN, FP, and FN scores for each class
+        """
         truth_values = {}
-        for class_name in self.classes:
-            truth_values[class_name] = {}
 
-            class_index = self.label_to_index[class_name]
+        for class_name in self.classes: # iterate over each class
+            truth_values[class_name] = {} # initialize empty dictionary
 
-            TP = self.confusion_matrix[class_index][class_index]
-            
+            class_index = self.label_to_index[class_name] # use our label map to retrieve the index corresponding to the current class
+
+            TP = self.confusion_matrix[class_index][class_index] # TP always exist along the diagonal
+
+            # FP = all values in the same row as TP (minus TP), that is all times another class was incorrectly predicted as this class
             FP = 0
             row = self.confusion_matrix[class_index]
             for value in row:
                 FP += value
             FP -= TP
 
+            # FN = all values in the same column as TP (minus TP), that is all times the class was incorrectly predicted as another class
             FN = 0
             for row in self.confusion_matrix:
                 FN += row[class_index]
             FN -= TP
 
+            # TN = all values in confusion matrix that isn't TP, FN, or FP
             TN = 0
             for row in self.confusion_matrix:
                 for value in row:
@@ -81,19 +88,25 @@ class ConfusionMatrix:
         return truth_values
 
     def generate_scores(self):
+        """
+        Use the truth values derived from the confusion matrix to calculate various scores
+        """
         scores = {}
-        for class_name in self.classes:
+        for class_name in self.classes: # iterate over each class
             scores[class_name] = {}
 
+            # extract truth values
             TP = self.truth_values[class_name]['TP']
             TN = self.truth_values[class_name]['TN']
             FP = self.truth_values[class_name]['FP']
             FN = self.truth_values[class_name]['FN']
 
+            # perform calculations
             accuracy = (TP + TN) / (TP + TN + FP + FN)
             precision = TP / (TP + FP)
             recall = TP / (TP + FN)
 
+            # save and return values
             scores[class_name]['Accuracy'] = accuracy
             scores[class_name]['Precision'] = precision
             scores[class_name]['Recall'] = recall
