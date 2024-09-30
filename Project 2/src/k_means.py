@@ -1,6 +1,4 @@
-import math
 import numpy as np
-from hyperparameter import *
 
 def distance(a, b):
     np_a = np.array(a)
@@ -12,7 +10,7 @@ def argmin(dictionary):
     return min(dictionary, key=dictionary.get)
 
 class KMeans:
-    def __init__(self, training_set):
+    def __init__(self, training_set, num_clusters):
         self.training_set = training_set
 
         self.num_features = len(training_set[0]) - 1
@@ -22,7 +20,7 @@ class KMeans:
 
         self.is_clustered = False
 
-        self.num_clusters = Hyperparameter('num_clusters', math.ceil(math.sqrt(len(training_set))), 1)
+        self.num_clusters = num_clusters
 
         self.load()
 
@@ -43,7 +41,7 @@ class KMeans:
         max_values = training_without_class_or_target.max(axis=0)
 
         # Generate random initial centroid values
-        mews = np.array([np.random.uniform(min_values, max_values) for _ in range(self.num_clusters.value)])
+        mews = np.array([np.random.uniform(min_values, max_values) for _ in range(self.num_clusters)])
 
         while not self.is_clustered:
             centroids = {tuple(value): [] for value in mews}
@@ -68,7 +66,7 @@ class KMeans:
 
     def update_new(self, centroids):
         # Create a new NumPy array to store updated centroids, same shape as the initial mews
-        new_mew = np.empty((self.num_clusters.value, len(self.training_set[0]) - 1))
+        new_mew = np.empty((self.num_clusters, len(self.training_set[0]) - 1))
 
         for i, (centroid, points) in enumerate(centroids.items()):
             if points:  # Avoid division by zero for empty clusters
