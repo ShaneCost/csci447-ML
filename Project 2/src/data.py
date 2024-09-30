@@ -71,9 +71,7 @@ class Data:
             good_folds = self.check_folds()
 
         k = Hyperparameter('k', 1, 1)
-        p = Hyperparameter('p', 1, 1)
         self.hyperparameters['k'] = k
-        self.hyperparameters['p'] = p
 
         if not self.is_class:
             epsilon_value, epsilon_step = self.generate_starting_epsilon()
@@ -83,7 +81,6 @@ class Data:
             sigma = Hyperparameter('sigma', sigma_value, sigma_step)
             self.hyperparameters['epsilon'] = epsilon
             self.hyperparameters['sigma'] = sigma
-
 
     def get_name(self):
         """
