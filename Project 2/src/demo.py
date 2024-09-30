@@ -1,15 +1,27 @@
 from data import *
+from k_means import *
 
 def main():
 
-    classification = ["../data/raw_data/breast-cancer-wisconsin.data", "../data/raw_data/glass.data", "../data/raw_data/soybean-small.data"]
-    regression = ["../data/raw_data/abalone.data", "../data/raw_data/forestfires.data", "../data/raw_data/machine.data"]
+    classification = ["../data/breast-cancer-wisconsin.data", "../data/glass.data", "../data/soybean-small.data"]
+    regression = ["../data/abalone.data", "../data/forestfires.data", "../data/machine.data"]
 
     for file in classification:
         data = Data(file, "class")
 
+        training_set = data.get_training_set(10)
+        test_set = data.get_test_set(10)
+
+        k_means = KMeans(training_set, test_set)
+
+        k_means.cluster()
+
+
     for file in regression:
         data = Data(file, "regress")
-
+        print(data.name)
+        for hyperparameter in data.hyperparameters:
+            print(hyperparameter, data.hyperparameters[hyperparameter].value)
+        print('\n')
 
 main()
