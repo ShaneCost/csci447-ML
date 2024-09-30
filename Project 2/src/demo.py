@@ -12,10 +12,7 @@ def main():
         training_set = data.get_training_set(10)
         test_set = data.get_test_set(10)
 
-        k_means = KMeans(training_set, test_set)
-
-        k_means.cluster()
-
+        k_means = KMeans(training_set)
 
     for file in regression:
         data = Data(file, "regress")
