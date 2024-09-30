@@ -25,12 +25,8 @@ class KMeans:
         self.load()
 
     def load(self):
-        self.tune_num_clusters()
         self.cluster()
         self.assign_centroid_values()
-
-    def tune_num_clusters(self):
-        pass
 
     def cluster(self):
         # Get the number of features (exclude the target or class column if present)
