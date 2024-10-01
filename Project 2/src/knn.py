@@ -1,12 +1,11 @@
 import numpy as np
 from collections import Counter
-from data import Data
 
-class KNN:
-    def __init__(self, training_data, testing_data):
+class KNN(object):
+    def __init__(self, training_data, testing_data, is_classification = True):
         self.training_data = np.array(training_data)
         self.testing_data = np.array(testing_data)
-        self.is_classification = True
+        self.is_classification = is_classification
     
     def classify(self, testing_data, k, p):
 
@@ -53,20 +52,20 @@ class KNN:
        
         return distance
 
+# from data import Data
+# def main():
 
-def main():
+#     path = "Project 2\data\soybean-small.data"
+#     data = Data(path, "class")
 
-    path = "Project 2\data\soybean-small.data"
-    data = Data(path, "class")
+#     training_set = data.get_training_set(1)
+#     test_set = data.get_test_set(1)
 
-    training_set = data.get_training_set(1)
-    test_set = data.get_test_set(1)
+#     knn = KNN(training_set, test_set)
+#     predications = knn.classify(test_set, 2, 2)
+#     actual = knn.get_actual()
 
-    knn = KNN(training_set, test_set)
-    predications = knn.classify(test_set, 2, 2)
-    actual = knn.get_actual()
+#     print(actual)
+#     print(predications)
 
-    print(actual)
-    print(predications)
-
-main()
+# main()
