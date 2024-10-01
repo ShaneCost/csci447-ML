@@ -52,7 +52,7 @@ class KNN(object):
        
         return distance
 
-# from data import Data
+from data import Data
 # def main():
 
 #     path = "Project 2\data\soybean-small.data"

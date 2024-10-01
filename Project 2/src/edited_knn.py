@@ -1,4 +1,4 @@
-from knn import KNN
+from data import Data
 
 class EditedKNN(KNN):
 
