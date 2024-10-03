@@ -71,23 +71,23 @@ class KNN(object):
 
         return distance
 
-from data import Data
-def main():
+# from data import Data
+# def main():
 
-    path = "Project 2\data\soybean-small.data"
-    data = Data(path, "class")
+#     path = "Project 2\data\soybean-small.data"
+#     data = Data(path, "class")
 
-    training_set = data.get_training_set(1)
-    test_set = data.get_test_set(1)
+#     training_set = data.get_training_set(1)
+#     test_set = data.get_test_set(1)
 
-    knn = KNN(training_set, test_set)
-    predications = knn.classify_all(1, 2)
-    actual = knn.get_actual_all()
+#     knn = KNN(training_set, test_set)
+#     predications = knn.classify_all(1, 2)
+#     actual = knn.get_actual_all()
 
-    print(actual)
-    print(predications)
+#     print(actual)
+#     print(predications)
 
-main()
+# main()
 # main()
 
 #
