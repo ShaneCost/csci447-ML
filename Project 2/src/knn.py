@@ -8,8 +8,7 @@ class KNN(object):
         # if False assumes regression
         self.is_classification = is_classification
 
-        # k is number of neighbors used in voting or average and p is the p variable in the distance formula
-
+    # k is number of neighbors used in voting or average and p is the p variable in the distance formula
     def classify(self, test_point, k, p):
 
         # get distance of a point
@@ -35,19 +34,27 @@ class KNN(object):
 
 
     def vote(self, distances, k):
-
         # voting/average (depending on is_classification)
-        distances = distances[0:k]
-        if (self.is_classification):
+        distances = distances[:k]  # Get the k nearest distances
+        if self.is_classification:
             classes = [t[1] for t in distances]
             prediction = Counter(classes).most_common(1)[0][0]
         else:
-            # impliment the kernal function
-            target_values = [t[1] for t in distances]
-            prediction = sum(target_values) / len(target_values)
+            # Implement the kernel function
+            neighbor_targets = np.array([t[1] for t in distances], dtype=np.float64)
+            distances = np.array([t[0] for t in distances], dtype=np.float64)
+            kernel_values = self.rbf_kernel(distances)
+            weights = kernel_values / np.sum(kernel_values)
+            # Compute the weighted sum of the target values
+            prediction = np.dot(weights, neighbor_targets)  # Now shapes will align
 
-        # prediction for class or target_value
+        # Return prediction for class or target_value
         return prediction
+
+    
+    def rbf_kernel(self, distances, gamma=1.0):
+        # Computes the RBF kernel values from distances
+        return np.exp(-gamma * distances ** 2)
 
     def get_actual(self, point):
 
@@ -62,7 +69,7 @@ class KNN(object):
             actual.append(point[-1])
         return actual
 
-    def get_distance(self, x, y, p):
+    def get_distance(self, x, y, p=2):
 
         # Minkowski distance
         x = np.array(x, dtype=np.float64)
@@ -71,57 +78,21 @@ class KNN(object):
 
         return distance
 
-# from data import Data
-# def main():
+from data import Data
+def main():
 
-#     path = "Project 2\data\soybean-small.data"
-#     data = Data(path, "class")
+    path = "Project 2\data\machine.data"
+    data = Data(path, "regress")
 
-#     training_set = data.get_training_set(1)
-#     test_set = data.get_test_set(1)
+    training_set = data.get_training_set(1)
+    test_set = data.get_test_set(1)
+    print("done.")
 
-#     knn = KNN(training_set, test_set)
-#     predications = knn.classify_all(1, 2)
-#     actual = knn.get_actual_all()
+    knn = KNN(training_set, test_set, is_classification=False)
+    predications = knn.classify_all(1, 2)
+    actual = knn.get_actual_all()
 
-#     print(actual)
-#     print(predications)
+    print(actual)
+    print(predications)
 
-# main()
-# main()
-
-#
-# def rbf_kernel(distances, gamma=1.0):
-#     """Computes the RBF kernel values from distances."""
-#     return np.exp(-gamma * distances ** 2)
-#
-#
-# def predict_knn_rbf_from_neighbors(neighbors, query_point, gamma=1.0):
-#     """
-#     Predict the target value using kernel-weighted k-NN regression, given k neighbors.
-#
-#     Parameters:
-#     - neighbors: A numpy array of shape (k, n_features + 1) where the last column is the target value.
-#     - query_point: The query point (1D numpy array of shape (n_features,))
-#     - gamma: RBF kernel parameter (default = 1.0)
-#
-#     Returns:
-#     - y_pred: Predicted target value (float)
-#     """
-#     # Separate features and target values from the neighbors array
-#     neighbor_features = neighbors[:, :-1]  # All columns except the last one
-#     neighbor_targets = neighbors[:, -1]  # Last column contains the target values
-#
-#     # Compute the Euclidean distances between the query point and the neighbors
-#     distances = np.linalg.norm(neighbor_features - query_point, axis=1)
-#
-#     # Compute RBF kernel values based on the distances
-#     kernel_values = rbf_kernel(distances, gamma)
-#
-#     # Normalize the kernel values to get weights
-#     weights = kernel_values / np.sum(kernel_values)
-#
-#     # Compute the weighted sum of the target values
-#     y_pred = np.dot(weights, neighbor_targets)
-#
-#     return y_pred
+main()
