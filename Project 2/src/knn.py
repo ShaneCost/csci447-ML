@@ -2,10 +2,10 @@ import numpy as np
 from collections import Counter
 
 class KNN(object):
-    def __init__(self, data, fold, is_classification=True):
+    def __init__(self, training_set, test_set, is_classification=True):
 
-        self.training_data = np.array(data.get_training_set(fold))
-        self.testing_data = np.array(data.get_test_set(fold))
+        self.training_data = np.array(training_set)
+        self.testing_data = np.array(test_set)
         # if False assumes regression
         self.is_classification = is_classification
 
@@ -88,7 +88,7 @@ def main():
     training_set = data.get_training_set(1)
     test_set = data.get_test_set(1)
 
-    knn = KNN(data, 1, is_classification=False)
+    knn = KNN(training_set, test_set, is_classification=False)
     predications = knn.classify_all(1, 2)
     actual = knn.get_actual_all()
 
