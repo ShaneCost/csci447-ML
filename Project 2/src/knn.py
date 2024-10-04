@@ -2,9 +2,10 @@ import numpy as np
 from collections import Counter
 
 class KNN(object):
-    def __init__(self, training_data, testing_data, is_classification=True):
-        self.training_data = np.array(training_data)
-        self.testing_data = np.array(testing_data)
+    def __init__(self, data, fold, is_classification=True):
+
+        self.training_data = np.array(data.get_training_set(fold))
+        self.testing_data = np.array(data.get_test_set(fold))
         # if False assumes regression
         self.is_classification = is_classification
 
@@ -14,7 +15,7 @@ class KNN(object):
         # get distance of a point
         distances = []
         for data_point in self.training_data:
-            distance = self.get_distance(test_point[:-1], data_point[:-1], p)
+            distance = self.get_distance(test_point[:-1], data_point[:-1])
             distances.append((distance, data_point[-1]))
 
         # containes the list of distances and each associated class
@@ -52,9 +53,9 @@ class KNN(object):
         return prediction
 
     
-    def rbf_kernel(self, distances, gamma=1.0):
+    def rbf_kernel(self, distances, sigma=1.0):
         # Computes the RBF kernel values from distances
-        return np.exp(-gamma * distances ** 2)
+        return np.exp(-sigma * distances ** 2)
 
     def get_actual(self, point):
 
@@ -86,9 +87,8 @@ def main():
 
     training_set = data.get_training_set(1)
     test_set = data.get_test_set(1)
-    print("done.")
 
-    knn = KNN(training_set, test_set, is_classification=False)
+    knn = KNN(data, 1, is_classification=False)
     predications = knn.classify_all(1, 2)
     actual = knn.get_actual_all()
 
