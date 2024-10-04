@@ -10,7 +10,7 @@ class KNN(object):
         self.is_classification = is_classification
 
     # k is number of neighbors used in voting or average and p is the p variable in the distance formula
-    def classify(self, test_point, k, p):
+    def classify(self, test_point, k, sigma):
 
         # get distance of a point
         distances = []
@@ -20,21 +20,21 @@ class KNN(object):
 
         # containes the list of distances and each associated class
         distances = sorted(distances)
-        predication = self.vote(distances, k)
+        predication = self.vote(distances, k, sigma)
 
         return predication
 
-    def classify_all(self, k, p):
+    def classify_all(self, k, sigma):
 
         predictions = []
         for test_point in self.testing_data:
-            prediction = self.classify(test_point, k, p)  # Corrected here
+            prediction = self.classify(test_point, k, sigma)  # Corrected here
             predictions.append(prediction)
 
         return predictions
 
 
-    def vote(self, distances, k):
+    def vote(self, distances, k, sigma):
         # voting/average (depending on is_classification)
         distances = distances[:k]  # Get the k nearest distances
         if self.is_classification:
@@ -44,7 +44,7 @@ class KNN(object):
             # Implement the kernel function
             neighbor_targets = np.array([t[1] for t in distances], dtype=np.float64)
             distances = np.array([t[0] for t in distances], dtype=np.float64)
-            kernel_values = self.rbf_kernel(distances)
+            kernel_values = self.rbf_kernel(distances, sigma)
             weights = kernel_values / np.sum(kernel_values)
             # Compute the weighted sum of the target values
             prediction = np.dot(weights, neighbor_targets)  # Now shapes will align
@@ -53,7 +53,7 @@ class KNN(object):
         return prediction
 
     
-    def rbf_kernel(self, distances, sigma=1.0):
+    def rbf_kernel(self, distances, sigma):
         # Computes the RBF kernel values from distances
         return np.exp(-sigma * distances ** 2)
 
@@ -79,20 +79,19 @@ class KNN(object):
 
         return distance
 
-from data import Data
-def main():
+# from data import Data
+# def main():
 
-    path = "Project 2\data\machine.data"
-    data = Data(path, "regress")
+#     path = "Project 2\data\machine.data"
+#     data = Data(path, "regress")
+#     training_set = data.get_training_set(1)
+#     test_set = data.get_test_set(1)
 
-    training_set = data.get_training_set(1)
-    test_set = data.get_test_set(1)
+#     knn = KNN(training_set, test_set, is_classification=False)
+#     predications = knn.classify_all(1, 1)
+#     # actual = knn.get_actual_all()
 
-    knn = KNN(training_set, test_set, is_classification=False)
-    predications = knn.classify_all(1, 2)
-    actual = knn.get_actual_all()
+#     # print(actual)
+#     print(predications)
 
-    print(actual)
-    print(predications)
-
-main()
+# main()
