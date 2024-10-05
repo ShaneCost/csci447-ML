@@ -30,29 +30,31 @@ class EditedKNN(KNN):
 
         self.training_data = new_training_data
 
- # from data import Data
-# def main():
 
+
+# from data import Data
+# def main():
+#
 #     path = "Project 2\data\machine.data"
 #     data = Data(path, "regress")
-    
+#
 #     training_set = data.get_training_set(1)
 #     test_set = data.get_test_set(1)
-
-
+#
+#
 #     epsilon =  data.hyperparameters['epsilon'].value
-
+#
 #     edited_knn = EditedKNN(training_set, test_set, epsilon)
-    
+#
 #     predications1 = edited_knn.classify_all(2)
 #     print(predications1)
 #     print(len(edited_knn.training_data))
-
+#
 #     edited_knn.edit(2)
-
+#
 #     print(len(edited_knn.training_data))
-
+#
 #     predications2 = edited_knn.classify_all(2)
 #     print(predications2)
-
+#
 # main()

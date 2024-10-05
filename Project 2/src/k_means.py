@@ -1,4 +1,5 @@
 import numpy as np
+from knn import *
 
 def distance(a, b):
     np_a = np.array(a)
@@ -10,7 +11,7 @@ def argmin(dictionary):
     return min(dictionary, key=dictionary.get)
 
 class KMeans:
-    def __init__(self, training_set, num_clusters):
+    def __init__(self, training_set, num_clusters, class_or_regress):
         self.training_set = training_set
 
         self.num_features = len(training_set[0]) - 1
@@ -21,6 +22,11 @@ class KMeans:
         self.is_clustered = False
 
         self.num_clusters = num_clusters
+
+        if class_or_regress == 'class':
+            self.is_class = True
+        else:
+            self.is_class = False
 
         self.load()
 
@@ -81,7 +87,20 @@ class KMeans:
         return new_mew
 
     def assign_centroid_values(self):
-        training = self.training_set
+        centroid_locations = []
+        for i in range(self.num_clusters):
+            centroid_locations.append(np.append(self.centroids_locations[i], 0).tolist())
+
+        knn = KNN(self.training_set, centroid_locations, self.is_class)
+        values = knn.classify_all(1, 1) # Let K = 1 and Sigma = 1 for assigning values to
+
+        num_features = self.num_features
+        for i in range(self.num_clusters):
+            centroid_locations[i][num_features] = values[i]
+
+        self.centroid_set = centroid_locations
+
+
 
 
 

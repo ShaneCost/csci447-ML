@@ -70,17 +70,20 @@ class Data:
 
             good_folds = self.check_folds()
 
-        k = Hyperparameter('k', 1, 1)
+        k = Hyperparameter('k', 1, len(self.tuning), 1)
         self.hyperparameters['k'] = k
 
         if not self.is_class:
-            epsilon_value, epsilon_step = self.generate_starting_epsilon()
-            sigma_value, sigma_step = self.generate_starting_sigma()
+            epsilon_value, epsilon_max, epsilon_step = self.generate_starting_epsilon()
+            sigma_value, sigma_max, sigma_step = self.generate_starting_sigma()
 
-            epsilon = Hyperparameter('epsilon', epsilon_value, epsilon_step)
-            sigma = Hyperparameter('sigma', sigma_value, sigma_step)
+            epsilon = Hyperparameter('epsilon', epsilon_value, epsilon_max, epsilon_step)
+            sigma = Hyperparameter('sigma', sigma_value, sigma_max, sigma_step)
             self.hyperparameters['epsilon'] = epsilon
             self.hyperparameters['sigma'] = sigma
+        else:
+            self.hyperparameters['epsilon'] = Hyperparameter('epsilon', 0, 0, 0)
+            self.hyperparameters['sigma'] = Hyperparameter('sigma', 0, 0, 0)
 
     def get_name(self):
         """
@@ -360,16 +363,19 @@ class Data:
 
     def generate_starting_epsilon(self):
         target_values = [float(row[-1]) for row in self.raw_data]
-        epsilon_start = 0.05 * (max(target_values) - min(target_values))
-        epsilon_step = 0.1 * (max(target_values) - min(target_values))
+        epsilon_start = 0.01 * (max(target_values) - min(target_values))
+        epsilon_step = 0.001 * (max(target_values) - min(target_values))
+        epsilon_max = 0.20 * (max(target_values) - min(target_values))
 
-        return epsilon_start, epsilon_step
+        return round(epsilon_start, 3), round(epsilon_max, 3), round(epsilon_step, 3)
 
     def generate_starting_sigma(self):
         data = np.array(self.raw_data, dtype=float)
         ranges = np.ptp(data[:, :-1], axis=0)
-        sigma = 0.1 * np.mean(ranges) # Set sigma as a fraction (10%) of the average feature range
-        return sigma, sigma
+        sigma_start = 0.1 * np.mean(ranges) # Set sigma as a fraction (10%) of the average feature range
+        sigma_step = 0.01 * np.mean(ranges)
+        max_value = 1
+        return round(sigma_start, 3), round(max_value, 3), round(sigma_step, 3)
 
 
 
