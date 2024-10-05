@@ -87,10 +87,11 @@ class KNN(object):
 #     test_set = data.get_test_set(1)
 
 #     knn = KNN(training_set, test_set, is_classification=False)
-#     predications = knn.classify_all(1, 1)
+#     predication1 = knn.classify_all(3, 1)
+#     predication2 =  knn.get_actual_all()
 #     # actual = knn.get_actual_all()
 
 #     # print(actual)
-#     print(predications)
+#     print(np.array(predication1) - np.array(predication2, dtype=np.float64))
 
 # main()
