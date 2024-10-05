@@ -58,7 +58,6 @@ class KNN(object):
         return np.exp(-sigma * distances ** 2)
 
     def get_actual(self, point):
-
         # returns the actual classes/target_values for a point
         actual = point[-1]
         return actual
