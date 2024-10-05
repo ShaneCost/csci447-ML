@@ -1,3 +1,5 @@
+__author__ = "<Shane Costello>"
+
 import numpy as np
 from knn import *
 

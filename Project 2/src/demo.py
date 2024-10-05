@@ -19,8 +19,8 @@ MACHINE_S = 0.86
 MACHINE_E = 244.6
 
 ABALONE_K = 10
-ABALONE_S = 0
-ABALONE_E = 0
+ABALONE_S = 0.72
+ABALONE_E = 0.28
 
 def main():
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]

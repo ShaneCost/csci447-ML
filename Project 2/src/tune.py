@@ -1,3 +1,5 @@
+__author__ = "<Shane Costello>"
+
 from data import *
 from knn import *
 from loss import *
@@ -77,9 +79,12 @@ def main():
         print("\n", data.name)
         tune(data, data.hyperparameters, "class")
 
-    # for file in regression:
-    #     data = Data(file, "regress")
-    #     print("\n", data.name)
-    #     tune(data, data.hyperparameters, "regress")
+    for file in regression:
+        data = Data(file, "regress")
+        print("\n", data.name)
+        tune(data, data.hyperparameters, "regress")
+
+    data = Data("../data/abalone.data", "regress")
+    tune(data, data.hyperparameters, "regress")
 
 main()
