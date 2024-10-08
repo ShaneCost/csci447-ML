@@ -1,21 +1,33 @@
+__author__ = "<Shane Costello>"
+
 import numpy as np
 import pandas as pd
 import math
 import random
 from hyperparameter import *
 
-# Function to determine if a column is categorical (contains letters)
+
 def is_cat(col):
+    """
+    Function to determine if a column is categorical (contains letters)
+
+    :param col: feature vector
+    :return: True if there are alphabetic values, otherwise False
+    """
     return any(c.isalpha() for c in ''.join(col.astype(str)))
 
-# Function to 0-1 normalize a feature vector
 def normalize(column):
-    # Convert raw_data to a NumPy array for easier manipulation
+    """
+    Function to 0-1 normalize a feature vector
+    :param column: feature vector
+    :return: 0-1 normalized feature vector
+    """
+    # Convert raw_data to a NumPy array
     feature_vector = np.array(column, dtype=float)
 
-    min_v = np.min(feature_vector)
-    max_v = np.max(feature_vector)
-    # Handle case where max_v is equal to min_v to avoid division by zero
+    min_v = np.min(feature_vector) # Get minimum value in the feature vector
+    max_v = np.max(feature_vector) # Get maximum value in the feature vector
+    # Handle case where max is equal to min to avoid division by zero
     if max_v == min_v:
         return np.zeros_like(feature_vector)  # Return a zero vector if all values are the same
 
@@ -25,6 +37,13 @@ def normalize(column):
 
 class Data:
     def __init__(self, path, class_or_regress):
+        """
+        Class used to read data in from file, performing processing, and create folds
+
+        :param path: string path to a data file
+        :param class_or_regress: string denoting whether it is a classification or regression problem
+        """
+        # Attributes derived from data
         self.path = path
         self.name = ""
         self.raw_data = []
@@ -39,6 +58,7 @@ class Data:
         self.num_classes = 0
         self.classes = []
 
+        # Folds + tuning set
         self.tuning = []
         self.fold_1 = []
         self.fold_2 = []
@@ -51,16 +71,22 @@ class Data:
         self.fold_9 = []
         self.fold_10 = []
 
+        # Dictionary used to store hyperparameters
         self.hyperparameters = {}
 
         self.load()
 
     def load(self):
+        """
+        Function called in instantiation to process file
+        :return: None
+        """
         self.get_name()
         self.process_file()
         self.one_hot_encode_and_normalize()
         self.set_to_float()
 
+        # Check if folds are evenly distributed
         good_folds = False
         while not good_folds:
             if self.is_class:
@@ -70,10 +96,11 @@ class Data:
 
             good_folds = self.check_folds()
 
+        # Create instances of Hyperparameter class
         k = Hyperparameter('k', 1, len(self.tuning), 1)
         self.hyperparameters['k'] = k
 
-        if not self.is_class:
+        if not self.is_class: # If it is a regression problem
             epsilon_value, epsilon_max, epsilon_step = self.generate_starting_epsilon()
             sigma_value, sigma_max, sigma_step = self.generate_starting_sigma()
 
@@ -81,7 +108,7 @@ class Data:
             sigma = Hyperparameter('sigma', sigma_value, sigma_max, sigma_step)
             self.hyperparameters['epsilon'] = epsilon
             self.hyperparameters['sigma'] = sigma
-        else:
+        else: # If it is a classification problem
             self.hyperparameters['epsilon'] = Hyperparameter('epsilon', 0, 0, 0)
             self.hyperparameters['sigma'] = Hyperparameter('sigma', 0, 0, 0)
 
@@ -153,51 +180,69 @@ class Data:
             self.classes = classes
 
     def one_hot_encode_and_normalize(self):
+        """
+        Function to apply one hot encoding to all categorical feature vectors and
+        normalize the feature vectors.
+
+        :return: None
+        """
         df = pd.DataFrame(self.raw_data) # Convert self.raw_data into a pandas DataFrame
 
-        # Separate the target column
         target_column = df.iloc[:, -1]  # Get the last column (target)
         feature_columns = df.iloc[:, :-1]  # Get all columns except the last one
 
-        cat_mask = feature_columns.apply(is_cat, axis=0) # Apply the function to each column and get a mask
+        cat_mask = feature_columns.apply(is_cat, axis=0) # Apply the function to each column
         cat_cols = feature_columns.columns[cat_mask] # Get the names of categorical columns using the mask
         df_encoded = pd.get_dummies(feature_columns, columns=cat_cols, drop_first=False) # Apply one-hot encoding to the categorical columns
-        # Normalize all feature columns
-        normalized_features = df_encoded.apply(normalize, axis=0)
+        normalized_features = df_encoded.apply(normalize, axis=0) # Normalize all feature columns
 
-        # Reconstruct the DataFrame with normalized features and the target column
-        df_normalized = pd.concat([normalized_features, target_column], axis=1)
+        df_normalized = pd.concat([normalized_features, target_column], axis=1) # Reconstruct the DataFrame with normalized features and the target column
 
+        # Get the new number of features with one-hot encoding
         row, col = df_normalized.shape
         self.num_features = col - 1
 
         self.raw_data = df_normalized.to_numpy() # Convert from dataframe back to numpy array
 
     def set_to_float(self):
+        """
+        Function to convert values from strings to floats
+        :return: None
+        """
         for row in self.raw_data:
             for i in range(len(row) - 1):
                 row[i] = float(row[i])
 
     def set_tuning(self):
-        for_ten_fold = self.raw_data.copy().tolist()
-        tuning_size = math.floor(len(self.raw_data) * .1)
+        """
+        Function to remove 10% of data at random and set it to be our tuning data set
+
+        :return: Modified data set (raw data without the values removed for tuning)
+        """
+        for_ten_fold = self.raw_data.copy().tolist() # Create a copy of the raw data to modify
+        tuning_size = math.floor(len(self.raw_data) * .1) # Generate size of tuning set (10% of total raw data)
 
         tuning = []
         removed = []
         removed_num = 0
 
-        while removed_num < tuning_size:
-            index = random.randint(0, len(for_ten_fold) - 1)
-            if index not in removed:
+        while removed_num < tuning_size: # While the tuning set is not full
+            index = random.randint(0, len(for_ten_fold) - 1) # Randomly generate index within the data set
+            if index not in removed: # If the index has not already been removed
                 removed.append(index)
-                tuning.append(for_ten_fold.pop(index))
+                tuning.append(for_ten_fold.pop(index)) # Append the value at that index to the tuning set, pop it off raw data
                 removed_num += 1
 
-        self.tuning = tuning
-        return for_ten_fold
+        self.tuning = tuning # Set attribute
+        return for_ten_fold # Return the modified data set
 
     def class_stratified_ten_fold(self):
-        data = self.set_tuning()
+        """
+        Function to create 10 stratified folds for a classification problem
+
+        :return: None
+        """
+        data = self.set_tuning() # Derive edited data set
 
         # Initialize the folds
         folds = [[] for _ in range(10)]
@@ -243,9 +288,14 @@ class Data:
         self.fold_10 = folds[9]
 
     def regress_stratified_ten_fold(self):
-        data = self.set_tuning()
+        """
+        Function to create 10 stratified folds for a regression problem
 
-        data.sort(key=lambda x: x[-1])
+        :return: None
+        """
+        data = self.set_tuning() # Derive edited data set
+
+        data.sort(key=lambda x: x[-1]) # Sort values based on target value
 
         # Split the data into groups of ten
         groups_of_10 = []
@@ -262,6 +312,7 @@ class Data:
             groups_of_10.append(data[start_idx:end_idx])
             start_idx = end_idx
 
+        # Pull values from groups of ten to create stratified folds
         folds = [[] for _ in range(10)]
         for i in range(10):
             for group in groups_of_10:
@@ -284,6 +335,11 @@ class Data:
         self.fold_10 = folds[9]
 
     def check_folds(self):
+        """
+        Function to check if the size variance among folds is 20% or less
+
+        :return: True if less than or equal to 20% variance, False otherwise
+        """
         folds = [0 for _ in range(10)]
         folds[0] = len(self.fold_1)
         folds[1] = len(self.fold_2)
@@ -362,17 +418,28 @@ class Data:
             return self.fold_10
 
     def generate_starting_epsilon(self):
-        target_values = [float(row[-1]) for row in self.raw_data]
-        epsilon_start = 0.01 * (max(target_values) - min(target_values))
-        epsilon_step = 0.001 * (max(target_values) - min(target_values))
-        epsilon_max = 0.20 * (max(target_values) - min(target_values))
+        """
+        Function to generate data pertaining to the hyperparameter epsilon
+
+        :return: Starting value, max value, step value
+        """
+        target_values = [float(row[-1]) for row in self.raw_data] # Pull of the target value vector
+        epsilon_start = 0.01 * (max(target_values) - min(target_values)) # Starting = 1% of variance in target values
+        epsilon_step = 0.001 * (max(target_values) - min(target_values)) # Step = 0.1% of variance in target values
+        epsilon_max = 0.20 * (max(target_values) - min(target_values)) # Max = 20% of variance in target values
 
         return round(epsilon_start, 3), round(epsilon_max, 3), round(epsilon_step, 3)
 
     def generate_starting_sigma(self):
-        data = np.array(self.raw_data, dtype=float)
-        ranges = np.ptp(data[:, :-1], axis=0)
-        sigma_start = 0.1 * np.mean(ranges) # Set sigma as a fraction (10%) of the average feature range
-        sigma_step = 0.01 * np.mean(ranges)
-        max_value = 1
+        """
+        Function to generate data pertaining to the hyperparameter sigma
+
+        :return: Starting value, max value, step value
+        """
+        data = np.array(self.raw_data, dtype=float) # Create NumPy array
+        ranges = np.ptp(data[:, :-1], axis=0) # Pull all feature vectors together and take the average range
+        sigma_start = 0.1 * np.mean(ranges) # Start = 10% of the average feature range
+        sigma_step = 0.01 * np.mean(ranges) # Step = 1% of the average feature range
+        max_value = 1 # Max = 1
+
         return round(sigma_start, 3), round(max_value, 3), round(sigma_step, 3)
