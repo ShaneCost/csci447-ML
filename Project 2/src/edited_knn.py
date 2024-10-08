@@ -7,7 +7,7 @@ class EditedKNN(KNN):
         super().__init__(training_set, test_set, is_classification)
         self.epsilon = epsilon
     
-    def edit(self, k):
+    def edit(self, k, s):
 
         new_training_data = []
 
@@ -18,9 +18,9 @@ class EditedKNN(KNN):
                 correct_classification = (self.classify(point, k) == self.get_actual(point))
 
             if not self.is_classification:
-                largest_value = self.classify(point, k) + self.epsilon
-                smallest_value = self.classify(point, k) - self.epsilon
-                correct_classification = largest_value >=  self.get_actual(point) <= smallest_value 
+                predicted_value = float(self.classify(point, k, s))
+                correct_classification = (self.get_actual(point) >= (predicted_value - self.epsilon) and
+                                          self.get_actual(point) <= (predicted_value + self.epsilon))
 
             if correct_classification:
                 new_training_data.append(point)
@@ -29,6 +29,7 @@ class EditedKNN(KNN):
                 break
 
         self.training_data = new_training_data
+        return self
 
 
 

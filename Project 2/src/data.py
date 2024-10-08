@@ -376,7 +376,3 @@ class Data:
         sigma_step = 0.01 * np.mean(ranges)
         max_value = 1
         return round(sigma_start, 3), round(max_value, 3), round(sigma_step, 3)
-
-
-
-

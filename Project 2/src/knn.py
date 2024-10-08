@@ -10,7 +10,7 @@ class KNN(object):
         self.is_classification = is_classification
 
     # k is number of neighbors used in voting or average and p is the p variable in the distance formula
-    def classify(self, test_point, k, sigma):
+    def classify(self, test_point, k, sigma=1):
 
         # get distance of a point
         distances = []
@@ -24,7 +24,7 @@ class KNN(object):
 
         return predication
 
-    def classify_all(self, k, sigma):
+    def classify_all(self, k, sigma=1):
 
         predictions = []
         for test_point in self.testing_data:
@@ -60,7 +60,7 @@ class KNN(object):
     def get_actual(self, point):
         # returns the actual classes/target_values for a point
         actual = point[-1]
-        return actual
+        return float(actual)
 
     def get_actual_all(self):
 

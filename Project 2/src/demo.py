@@ -2,6 +2,8 @@ from data import *
 from knn import *
 from edited_knn import *
 from k_means import *
+from confusion_matrix import *
+from loss import *
 
 # CONSTANTS
 BREASTCANCER_K = 3
@@ -24,13 +26,23 @@ ABALONE_E = 0
 
 def main():
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    classification = ["../data/breast-cancer-wisconsin.data", "../data/glass.data", "../data/soybean-small.data"]
-    regression = ["../data/forestfires.data", "../data/machine.data", "../data/abalone.data",]
+
+    classification = ["Project 2\data\\breast-cancer-wisconsin.data","Project 2\data\glass.data","Project 2\data\soybean-small.data"]
+    regression = ["Project 2\data\\forestfires.data","Project 2\data\machine.data","Project 2\data\\abalone.data"]
+
+    classification_hyper = [[3], [2], [4]]
+    regression_hyper = [[5, 0.52, 218.168], [1, 0.52, 218.168], [10, 0, 0]]
+
+    # classification = ["../data/breast-cancer-wisconsin.data", "../data/glass.data", "../data/soybean-small.data"]
+    # regression = ["../data/forestfires.data", "../data/machine.data", "../data/abalone.data",]
 
     # DEMONSTRATION OF USING k_means TO GET REDUCED TRAINING SET
-    for file in classification:
+    for index, file in enumerate(regression):
         # Create data class
-        data = Data(file, "class")
+        data = Data(file, "regress")    
+
+        all_predictions = []
+        all_actual = []
 
         # Iterate over the folds
         for fold in folds:
@@ -39,21 +51,37 @@ def main():
             test = data.get_test_set(fold)
 
             # Use editedKNN to derive the number of clusters
-            # edited = EditedKNN(training, test, 0, True).edit(1) # TODO: UPDATE edit() TO TAKE IN CORRECT k VALUE BY FILE
+            k = regression_hyper[index][0]
+            s = regression_hyper[index][1]
+            e = regression_hyper[index][2]
+
+            # edited = EditedKNN(training, test, e, is_classification=False).edit(k, s) 
+            # print("Done getting data")
+
             # num_clusters = len(edited.training_data)
-            num_clusters = 2
-            # Instantiate k_means # TODO: I was getting an error when using the edited_knn() class (hence it being commented out above) because of a missing parameter value in one of the functions. I didn't want to change the file because I thought you might have already fixed the error but not pushed the changes. Once the error is fixed, uncomment the 2 lines above to set num_cluster = size of the edited data set instead of the hard coded '2'
-            k_means = KMeans(training, num_clusters, "class")
+            # k_means = KMeans(training, num_clusters, "regress")
+            # training_set_for_k_means = k_means.centroid_set
+ 
+    #         # Instantiate knn with reduced training set and call classify_all()
+            knn = KNN(training, test)
 
-            # Use the centroid set as the new training set
-            training_set_for_k_means = k_means.centroid_set
+            print(knn.get_actual_all())
+            knn_c = knn.classify_all(k, s)
+            print(knn_c)
 
-            # Instantiate knn with reduced training set and call classify_all()
-            knn = KNN(training_set_for_k_means, test, True)
-            predicted = knn.classify_all(1, 1) # TODO: UPDATE classify_all() TO TAKE IN CORRECT k AND sigma VALUES BASED ON FILE
+            all_actual.extend(knn.get_actual_all())
+            all_predictions.extend(knn_c)
+            print(fold)
+            print(Loss(all_predictions, all_actual, "regress", e).mean_squared_error())
 
-    for file in regression:
-        data = Data(file, "regress")
+
+        print(Loss(all_predictions, all_actual, "regress", e).mean_squared_error())
+
+    
+
+
+    # for file in regression:
+    #     data = Data(file, "regress")
 
 if __name__ == '__main__':
     main()
