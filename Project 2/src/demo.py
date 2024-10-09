@@ -27,62 +27,166 @@ ABALONE_E = 0.28
 def main():
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-    classification = ["Project 2\data\\breast-cancer-wisconsin.data","Project 2\data\glass.data","Project 2\data\soybean-small.data"]
-    regression = ["Project 2\data\\forestfires.data","Project 2\data\machine.data","Project 2\data\\abalone.data"]
+    # Windows 
+    classification = "Project 2\data\soybean-small.data"
+    regression = "Project 2\data\\forestfires.data"
 
-    classification_hyper = [[3], [2], [4]]
-    regression_hyper = [[5, 0.52, 218.168], [1, 0.52, 218.168], [10, 0, 0]]
-
-    # classification = ["../data/breast-cancer-wisconsin.data", "../data/glass.data", "../data/soybean-small.data"]
-    # regression = ["../data/forestfires.data", "../data/machine.data", "../data/abalone.data",]
-
-    # DEMONSTRATION OF USING k_means TO GET REDUCED TRAINING SET
-    for index, file in enumerate(regression):
-        # Create data class
-        data = Data(file, "regress")    
-
-        all_predictions = []
-        all_actual = []
-
-        # Iterate over the folds
-        for fold in folds:
-            # Get training and test set
-            training = data.get_training_set(fold)
-            test = data.get_test_set(fold)
-
-            # Use editedKNN to derive the number of clusters
-            k = regression_hyper[index][0]
-            s = regression_hyper[index][1]
-            e = regression_hyper[index][2]
-
-            # edited = EditedKNN(training, test, e, is_classification=False).edit(k, s) 
-            # print("Done getting data")
-
-            # num_clusters = len(edited.training_data)
-            # k_means = KMeans(training, num_clusters, "regress")
-            # training_set_for_k_means = k_means.centroid_set
- 
-    #         # Instantiate knn with reduced training set and call classify_all()
-            knn = KNN(training, test)
-
-            print(knn.get_actual_all())
-            knn_c = knn.classify_all(k, s)
-            print(knn_c)
-
-            all_actual.extend(knn.get_actual_all())
-            all_predictions.extend(knn_c)
-            print(fold)
-            print(Loss(all_predictions, all_actual, "regress", e).mean_squared_error())
+    classification_hyper = [[4]]
+    regression_hyper = [[5, 0.52, 218]]
 
 
-        print(Loss(all_predictions, all_actual, "regress", e).mean_squared_error())
+    all_predictions_edited_knn = []
+    all_predictions_k_mean_knn = []
+    all_predictions_knn = []
 
+    all_actual_edited_knn = []
+    all_actual_k_mean_knn = []
+    all_actual_knn = []
+    k = classification_hyper[0][0]
+
+    data = Data(classification, 'class')
+
+    # Distance example and classification of a point with k nearest neighbors
+    training = data.get_training_set(1)
+    test = data.get_test_set(1)
+
+    knn = KNN(training, test)
+    distance = knn.get_distance(training[0][:-1], test[0][:-1])
+    print("Distance Between",training[0][:-1]," and ",test[0][:-1]," ",distance)
+
+    input("Continue: ")
+    print("k nearest neighbors")
+
+    print("Point classification",knn.classify(training[0], k, print_distances = True))
+
+    input("Continue: ")
+
+
+    for fold in folds:
+
+        print("Fold number:", fold)
+        
+        training = data.get_training_set(fold)
+        test = data.get_test_set(fold)
+
+        # Edited KNN
+        edited = EditedKNN(training, test).edit(k)
+        edited_knn = KNN(edited.training_data, test)
+        ekn_predictions = edited_knn.classify_all(k)
+
+        all_actual_edited_knn.extend(edited_knn.get_actual_all())
+        all_predictions_edited_knn.extend(ekn_predictions)
+
+        # # K Means
+        num_clusters = len(edited.training_data)
+        k_means = KMeans(training, num_clusters, "class")
+        training_set_for_k_means = k_means.centroid_set
+        k_means_knn = KNN(training_set_for_k_means, test)
+        km_predictions = k_means_knn.classify_all(k)
+
+        all_actual_k_mean_knn.extend(k_means_knn.get_actual_all())
+        all_predictions_k_mean_knn.extend(km_predictions)
+
+         # KNN
+        knn = KNN(training, test)
+        knn_predictions = knn.classify_all(k)
+
+        all_actual_knn.extend(knn.get_actual_all())
+        all_predictions_knn.extend(knn_predictions)
+
+    ConfusionMatrix(all_actual_edited_knn, all_predictions_edited_knn).print_confusion_matrix()
+    ConfusionMatrix(all_actual_k_mean_knn, all_predictions_k_mean_knn).print_confusion_matrix()
+    ConfusionMatrix(all_actual_knn, all_predictions_knn).print_confusion_matrix()
+
+    input("Continue: ")
+
+
+
+    # Create data class
+    all_predictions_edited_knn = []
+    all_predictions_k_mean_knn = []
+    all_predictions_knn = []
     
+    all_actual_edited_knn = []
+    all_actual_k_mean_knn = []
+    all_actual_knn = [] 
+    k = regression_hyper[0][0]
+    s = regression_hyper[0][1]
+    e = regression_hyper[0][2]
+    
+    # RBF Kernal exmaple and prediciton of a point for regression
+    data = Data(regression, "regress")
+    
+    training = data.get_training_set(1)
+    test = data.get_test_set(1)
+
+    knn = KNN(training, test, is_classification=False)
+   
+
+    print("k nearest neighbors")
+    knn_predictions = knn.classify(training[0],k, s, print_distances = True)
+    print("Predicaiton: ",knn_predictions)
+    print("RBF Kernal ex: ", knn.classify(training[1],k, s))
+
+    # TODO Demonstrate a data point being associated with a cluster while performing k-means clustering
 
 
-    # for file in regression:
-    #     data = Data(file, "regress")
+    input("Continue: ")
+
+
+    show_example = False
+
+    for fold in folds:
+        print("Fold number:", fold)
+
+        training = data.get_training_set(fold)
+        test = data.get_test_set(fold)
+
+        # TODO Show your data being split into ten folds for one of the data sets. IDK how to do this.
+        if fold == 1:
+            print("Training data for fold 1:", training[0])
+            print("Test data for fold 1:", test[0])
+            show_example = True
+        else:
+            show_example = False
+
+
+        # Edited KNN
+        edited = EditedKNN(training, test, e, is_classification=False).edit(k, s, show_example=show_example)
+        edited_knn = KNN(edited.training_data, test)
+        ekn_predictions = edited_knn.classify_all(k, s)
+
+        all_actual_edited_knn.extend(edited_knn.get_actual_all())
+        all_predictions_edited_knn.extend(ekn_predictions)
+
+        # K Means
+        num_clusters = len(edited.training_data)
+        k_means = KMeans(training, num_clusters, "regress")
+        training_set_for_k_means = k_means.centroid_set
+        k_means_knn = KNN(training_set_for_k_means, test, is_classification=False)
+        km_predictions = k_means_knn.classify_all(k, s)
+
+        all_actual_k_mean_knn.extend(k_means_knn.get_actual_all())
+        all_predictions_k_mean_knn.extend(km_predictions)
+
+        # KNN
+        knn = KNN(training, test, is_classification=False)
+        knn_predictions = knn.classify_all(k, s)
+
+        all_actual_knn.extend(knn.get_actual_all())
+        all_predictions_knn.extend(knn_predictions)
+
+    # Calculate Mean Squared Error for each model
+    mse_edited_knn = Loss(all_predictions_edited_knn, all_actual_edited_knn, "regress", e).mean_squared_error()
+    mse_k_mean_knn = Loss(all_predictions_k_mean_knn, all_actual_k_mean_knn, "regress", e).mean_squared_error()
+    mse_knn = Loss(all_predictions_knn, all_actual_knn, "regress", e).mean_squared_error()
+
+    # Output the results
+    print("Mean Squared Error for Edited KNN:", mse_edited_knn)
+    print("Mean Squared Error for K Means:", mse_k_mean_knn)
+    print("Mean Squared Error for KNN:", mse_knn)
+
+    input("Continue: ")
 
 if __name__ == '__main__':
     main()
-

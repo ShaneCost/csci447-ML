@@ -50,12 +50,13 @@ class DecisionMatrix:
 if __name__ == "__main__":
     # Input confusion matrix as a string
     confusion_matrix_str = """
-    soybean-small
-    D1:    D2:    D3:    D4:
-    D1:    10     0      0      0
-    D2:    0      8      0      2
-    D3:    1      0      9      0
-    D4:    0      0      0     13
+    Classes: 1:   2:   3:   5:   6:   7:
+    1:       60    0    0    0    0    0
+    2:       4     55   9    1    1    0
+    3:       0     2    13   0    0    0
+    5:       0     7    0    2    0    3
+    6:       0     2    0    0    5    2
+    7:       0     0    0    1    4    22
     """
     
     matrix = DecisionMatrix(confusion_matrix_str)

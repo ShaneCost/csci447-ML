@@ -3,95 +3,97 @@ from collections import Counter
 
 class KNN(object):
     def __init__(self, training_set, test_set, is_classification=True):
-
+        # Convert training and testing sets to NumPy arrays for easier manipulation
         self.training_data = np.array(training_set)
         self.testing_data = np.array(test_set)
-        # if False assumes regression
+        # Determine if the task is classification or regression
         self.is_classification = is_classification
 
-    # k is number of neighbors used in voting or average and p is the p variable in the distance formula
-    def classify(self, test_point, k, sigma=1):
-
-        # get distance of a point
+    # Classify a single test point using k-nearest neighbors
+    def classify(self, test_point, k, sigma=1, print_distances=False):
+        # List to hold distances from the test point to each training point
         distances = []
         for data_point in self.training_data:
+            # Calculate distance and append to distances list
             distance = self.get_distance(test_point[:-1], data_point[:-1])
             distances.append((distance, data_point[-1]))
 
-        # containes the list of distances and each associated class
+        # Sort distances based on the distance value
         distances = sorted(distances)
-        predication = self.vote(distances, k, sigma)
+        # Use the voting mechanism to make a prediction
+        prediction = self.vote(distances, k, sigma)
 
-        return predication
+        if print_distances:
+            # Print the distances of the k nearest neighbors if requested
+            print(distances[:k])
 
+        return prediction
+
+    # Classify all test points
     def classify_all(self, k, sigma=1):
-
         predictions = []
         for test_point in self.testing_data:
-            prediction = self.classify(test_point, k, sigma)  # Corrected here
+            # Classify each test point
+            prediction = self.classify(test_point, k, sigma)
             predictions.append(prediction)
 
         return predictions
 
-
+    # Voting mechanism for classification or averaging for regression
     def vote(self, distances, k, sigma):
-        # voting/average (depending on is_classification)
-        distances = distances[:k]  # Get the k nearest distances
+        # Get the k nearest neighbors
+        distances = distances[:k]
         if self.is_classification:
+            # For classification, find the most common class among the neighbors
             classes = [t[1] for t in distances]
             prediction = Counter(classes).most_common(1)[0][0]
         else:
-            # Implement the kernel function
+            # For regression, use RBF kernel for weighted average
             neighbor_targets = np.array([t[1] for t in distances], dtype=np.float64)
             distances = np.array([t[0] for t in distances], dtype=np.float64)
             kernel_values = self.rbf_kernel(distances, sigma)
             weights = kernel_values / np.sum(kernel_values)
-            # Compute the weighted sum of the target values
-            prediction = np.dot(weights, neighbor_targets)  # Now shapes will align
+            # Compute the weighted sum of target values
+            prediction = np.dot(weights, neighbor_targets)
 
-        # Return prediction for class or target_value
         return prediction
 
-    
+    # Radial basis function (RBF) kernel
     def rbf_kernel(self, distances, sigma):
-        # Computes the RBF kernel values from distances
+        # Compute the RBF kernel values based on distances
         return np.exp(-sigma * distances ** 2)
 
+    # Get the actual class or target value for a specific point
     def get_actual(self, point):
-        # returns the actual classes/target_values for a point
         actual = point[-1]
-        return float(actual)
+        return float(actual) if not self.is_classification else actual
 
+    # Retrieve actual values for all test points
     def get_actual_all(self):
-
-        actual = []
-        for point in self.testing_data:
-            actual.append(point[-1])
+        actual = [point[-1] for point in self.testing_data]
         return actual
 
+    # Calculate Minkowski distance between two points
     def get_distance(self, x, y, p=2):
-
-        # Minkowski distance
         x = np.array(x, dtype=np.float64)
         y = np.array(y, dtype=np.float64)
+        # Calculate the distance based on the given p-value
         distance = np.sum(np.abs(x - y) ** p) ** (1 / p)
-
         return distance
 
+# Sample usage commented out
 # from data import Data
 # def main():
-
 #     path = "Project 2\data\machine.data"
 #     data = Data(path, "regress")
 #     training_set = data.get_training_set(1)
 #     test_set = data.get_test_set(1)
 
 #     knn = KNN(training_set, test_set, is_classification=False)
-#     predication1 = knn.classify_all(3, 1)
-#     predication2 =  knn.get_actual_all()
-#     # actual = knn.get_actual_all()
+#     prediction1 = knn.classify_all(3, 1)
+#     prediction2 = knn.get_actual_all()
 
-#     # print(actual)
-#     print(np.array(predication1) - np.array(predication2, dtype=np.float64))
+#     # Compare predictions with actual values
+#     print(np.array(prediction1) - np.array(prediction2, dtype=np.float64))
 
 # main()
