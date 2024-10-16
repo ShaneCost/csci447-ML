@@ -1,3 +1,5 @@
+__author__ = "<Hayden Perusich>"
+
 from knn import KNN
 
 class EditedKNN(KNN):
@@ -10,6 +12,8 @@ class EditedKNN(KNN):
     def edit(self, k, s=0, show_example=False):
         # Create a new list to hold edited training data
         new_training_data = []
+
+        removed_count = 0
 
         for point in self.training_data:
             # Determine if the current point is correctly classified

@@ -36,7 +36,7 @@ def normalize(column):
     return normalized_vector
 
 class Data:
-    def __init__(self, path, class_or_regress):
+    def __init__(self, path, class_or_regress, print_folds=False):
         """
         Class used to read data in from file, performing processing, and create folds
 
@@ -49,6 +49,7 @@ class Data:
         self.raw_data = []
         self.num_features = 0
         self.num_entries = 0
+        self.print_folds = print_folds
 
         if class_or_regress == 'class':
             self.is_class = True
@@ -286,6 +287,25 @@ class Data:
         self.fold_8 = folds[7]
         self.fold_9 = folds[8]
         self.fold_10 = folds[9]
+
+    def print_ten_folds(self):
+        """
+        Nicely prints the ten-fold cross validation sets
+        """
+        folds = [self.fold_1, self.fold_2, self.fold_3, self.fold_4, self.fold_5, self.fold_6, self.fold_7, self.fold_8, self.fold_9, self.fold_10]
+        for i, fold in enumerate(folds, 1):
+            print(f"Fold {i}:")
+            print(f"  Number of instances: {len(fold)}")
+            class_counts = {}
+            for instance in fold:
+                class_label = instance[-1]
+                if class_label in class_counts:
+                    class_counts[class_label] += 1
+                else:
+                    class_counts[class_label] = 1
+            for class_label, count in class_counts.items():
+                print(f"    {class_label}: {count} instances")
+            print('-' * 40)
 
     def regress_stratified_ten_fold(self):
         """

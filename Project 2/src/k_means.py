@@ -27,7 +27,7 @@ def argmin(dictionary):
     return min(dictionary, key=dictionary.get)
 
 class KMeans:
-    def __init__(self, training_set, num_clusters, class_or_regress):
+    def __init__(self, training_set, num_clusters, class_or_regress, print_cluster=False):
         """
         Class used to implement k-means clustering algorithm. Used to derive a reduced data set
 
@@ -50,6 +50,8 @@ class KMeans:
             self.is_class = True
         else:
             self.is_class = False
+
+        self.print = print_cluster
 
         self.load()
 
@@ -88,6 +90,9 @@ class KMeans:
                     distances[tuple(value)] = distance(x, value)
 
                 centroids[argmin(distances)].append(x)
+                if self.print:
+                    self.print_point_to_cluster(x.tolist(), distances)
+                    self.print = False
 
             new_mews = self.update_new(centroids)
 
@@ -99,6 +104,7 @@ class KMeans:
                 mews = new_mews
 
         self.centroids_locations = mews
+
 
     def update_new(self, centroids):
         """
@@ -149,6 +155,22 @@ class KMeans:
             centroid_set[i][num_features] = values[i] # Overwrite the 0 in the last column of each centroid with the new values derived from KNN
 
         self.centroid_set = centroid_set
+
+    def print_point_to_cluster(self, point, distances):
+        """
+        Function to print the assignment of a point to a cluster
+        :param point: The data point being assigned
+        :param distances: Dictionary of centroid-distance pairs
+        :return: None
+        """
+        print(f"Assigning point {point}\n")
+        for centroid, distance in distances.items():
+            print(f"  Centroid location: {centroid} \n\t Distance from point: {distance}")
+
+        closest_centroid = argmin(distances)
+        print(f"\nClosest Centroid: {closest_centroid}\nAssigned point to cluster\n")
+
+
 
 
 

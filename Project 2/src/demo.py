@@ -1,3 +1,5 @@
+__author__ = "<Hayden Perusich>"
+
 from data import *
 from knn import *
 from edited_knn import *
@@ -28,12 +30,11 @@ def main():
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     # Windows 
-    classification = "Project 2\data\soybean-small.data"
-    regression = "Project 2\data\\forestfires.data"
+    classification = "../data/soybean-small.data"
+    regression = "../data/forestfires.data"
 
     classification_hyper = [[4]]
     regression_hyper = [[5, 0.52, 218]]
-
 
     all_predictions_edited_knn = []
     all_predictions_k_mean_knn = []
@@ -44,15 +45,23 @@ def main():
     all_actual_knn = []
     k = classification_hyper[0][0]
 
-    data = Data(classification, 'class')
+    data = Data(classification, 'class', print_folds=True)
 
+    print("Stratified Ten Fold")
+    print(data.raw_data, "\n")
+
+    data.print_ten_folds()
+
+
+    input("Continue: ")
     # Distance example and classification of a point with k nearest neighbors
     training = data.get_training_set(1)
     test = data.get_test_set(1)
 
     knn = KNN(training, test)
     distance = knn.get_distance(training[0][:-1], test[0][:-1])
-    print("Distance Between",training[0][:-1]," and ",test[0][:-1]," ",distance)
+    print("Distance Between\n",training[0][:-1],"\nand\n",test[0][:-1],"\n="
+                                                                       "",distance)
 
     input("Continue: ")
     print("k nearest neighbors")
@@ -61,7 +70,10 @@ def main():
 
     input("Continue: ")
 
+    print("K means classification")
+    k_means = KMeans(training, 5, "class", print_cluster=True)
 
+    input("Continue: ")
     for fold in folds:
 
         print("Fold number:", fold)
@@ -94,13 +106,14 @@ def main():
         all_actual_knn.extend(knn.get_actual_all())
         all_predictions_knn.extend(knn_predictions)
 
+    print("Edited KNN")
     ConfusionMatrix(all_actual_edited_knn, all_predictions_edited_knn).print_confusion_matrix()
+    print("K-Means KNN")
     ConfusionMatrix(all_actual_k_mean_knn, all_predictions_k_mean_knn).print_confusion_matrix()
+    print("KNN")
     ConfusionMatrix(all_actual_knn, all_predictions_knn).print_confusion_matrix()
 
     input("Continue: ")
-
-
 
     # Create data class
     all_predictions_edited_knn = []
@@ -126,11 +139,10 @@ def main():
     print("k nearest neighbors")
     knn_predictions = knn.classify(training[0],k, s, print_distances = True)
     print("Predicaiton: ",knn_predictions)
-    print("RBF Kernal ex: ", knn.classify(training[1],k, s))
 
-    # TODO Demonstrate a data point being associated with a cluster while performing k-means clustering
-
-
+    input("Continue: ")
+    print("RBF Kernal ex: ", knn.classify(training[1],k, s, print_rbf=True
+                                          ))
     input("Continue: ")
 
 
@@ -142,17 +154,8 @@ def main():
         training = data.get_training_set(fold)
         test = data.get_test_set(fold)
 
-        # TODO Show your data being split into ten folds for one of the data sets. IDK how to do this.
-        if fold == 1:
-            print("Training data for fold 1:", training[0])
-            print("Test data for fold 1:", test[0])
-            show_example = True
-        else:
-            show_example = False
-
-
         # Edited KNN
-        edited = EditedKNN(training, test, e, is_classification=False).edit(k, s, show_example=show_example)
+        edited = EditedKNN(training, test, e, is_classification=False).edit(k, s, show_example=True)
         edited_knn = KNN(edited.training_data, test)
         ekn_predictions = edited_knn.classify_all(k, s)
 
@@ -182,6 +185,7 @@ def main():
     mse_knn = Loss(all_predictions_knn, all_actual_knn, "regress", e).mean_squared_error()
 
     # Output the results
+    input("Continue: ")
     print("Mean Squared Error for Edited KNN:", mse_edited_knn)
     print("Mean Squared Error for K Means:", mse_k_mean_knn)
     print("Mean Squared Error for KNN:", mse_knn)

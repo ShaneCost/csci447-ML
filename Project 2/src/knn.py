@@ -1,3 +1,5 @@
+__author__ = "<Hayden Perusich>"
+
 import numpy as np
 from collections import Counter
 
@@ -10,7 +12,7 @@ class KNN(object):
         self.is_classification = is_classification
 
     # Classify a single test point using k-nearest neighbors
-    def classify(self, test_point, k, sigma=1, print_distances=False):
+    def classify(self, test_point, k, sigma=1, print_distances=False, print_rbf=False):
         # List to hold distances from the test point to each training point
         distances = []
         for data_point in self.training_data:
@@ -26,6 +28,8 @@ class KNN(object):
         if print_distances:
             # Print the distances of the k nearest neighbors if requested
             print(distances[:k])
+        if print_rbf:
+            self.print_rbf(distances[:k], sigma)
 
         return prediction
 
@@ -63,6 +67,17 @@ class KNN(object):
         # Compute the RBF kernel values based on distances
         return np.exp(-sigma * distances ** 2)
 
+    def print_rbf(self, distances, sigma):
+        neighbor_targets = np.array([t[1] for t in distances], dtype=np.float64)
+        distances = np.array([t[0] for t in distances], dtype=np.float64)
+        kernel_values = np.exp(-sigma * distances ** 2)
+        weights = kernel_values / np.sum(kernel_values)
+        prediction = np.dot(weights, neighbor_targets)
+        print("kernel values = (",-sigma, "*", distances,")^2")
+        print("weights = ", kernel_values, "/", np.sum(kernel_values))
+        print("prediction = ", weights, "*", neighbor_targets)
+        print(prediction)
+
     # Get the actual class or target value for a specific point
     def get_actual(self, point):
         actual = point[-1]
@@ -81,19 +96,3 @@ class KNN(object):
         distance = np.sum(np.abs(x - y) ** p) ** (1 / p)
         return distance
 
-# Sample usage commented out
-# from data import Data
-# def main():
-#     path = "Project 2\data\machine.data"
-#     data = Data(path, "regress")
-#     training_set = data.get_training_set(1)
-#     test_set = data.get_test_set(1)
-
-#     knn = KNN(training_set, test_set, is_classification=False)
-#     prediction1 = knn.classify_all(3, 1)
-#     prediction2 = knn.get_actual_all()
-
-#     # Compare predictions with actual values
-#     print(np.array(prediction1) - np.array(prediction2, dtype=np.float64))
-
-# main()
