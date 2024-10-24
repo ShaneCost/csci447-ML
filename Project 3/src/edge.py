@@ -6,6 +6,19 @@ class Edge:
 
     def update_weight(self, new_weight):
         self.weight = new_weight
+    
+    def get_weight(self):
+        return self.weight
+
+    def get_start(self):
+        return self.start
+    
+    def get_end(self):
+        return self.end
+    
+    def print_edge(self):
+        print("Edge: start",self.start," end: ", self.end," weight: ", self.weight)
+
 
 class EdgeSet:
     def __init__(self):
