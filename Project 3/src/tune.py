@@ -13,7 +13,7 @@ def tune(data):
         score = 0
         for fold in folds:
             training = MetaData(data.get_training_set(fold))
-            testing = MetaData(data.get_test_set(fold))
+            testing = MetaData(data.tuning)
             score += random.randint(-5, 5)
         score /= 10
         num_nodes.update(score)
@@ -22,7 +22,7 @@ def tune(data):
         score = 0
         for fold in folds:
             training = MetaData(data.get_training_set(fold))
-            testing = MetaData(data.get_test_set(fold))
+            testing = MetaData(data.tuning)
             score += random.randint(-5, 5)
         score /= 10
         learning_rate.update(score)
