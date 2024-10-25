@@ -27,8 +27,8 @@ class Node:
 
     def activation(self):
         """Compute the activation using the hyperbolic tangent function."""
-        self.activation_value = self.hyperbolic_tangent()
-        return self.activation_value
+        self.value = self.hyperbolic_tangent()
+        return self.value
 
 
 class NodeSet:
