@@ -7,6 +7,7 @@ class Node:
         self.bias = bias
         self.gradient_delta_value = 0
         self.class_name = None
+        self.sof
 
     def hyperbolic_tangent(self):
         """Calculate and return the hyperbolic tangent of the node's value."""
@@ -35,13 +36,14 @@ class NodeSet:
         self.input_layer = []
         self.hidden_layers = []
         self.output_layer = []
+        self.soft_max_values = {}
 
     def soft_max(self):
         values = {}
-        # Calculate the exponentials of the output values
+        # Calculate the exponential of the output values
         exp_values = np.exp([node.value for node in self.output_layer])
 
-        # Calculate the denominator (sum of exponentials)
+        # Calculate the denominator (sum of exponential)
         denominator = np.sum(exp_values)
 
         # Calculate softmax values
