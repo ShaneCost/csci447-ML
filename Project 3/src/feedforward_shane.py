@@ -113,7 +113,7 @@ class FeedForwardNetwork:
             self.node_set.linear_activation()
 
 
-    def loss(self, y_pred, y_true, type='cross_entropy'):
+    def loss(self, y_pred, y_true):
 
         y_pred = np.array(y_pred, dtype=np.float64)
         y_true = np.array(y_true, dtype=np.float64)

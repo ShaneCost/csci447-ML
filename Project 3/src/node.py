@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 class Node:
     def __init__(self, bias):
@@ -34,3 +35,17 @@ class NodeSet:
         self.input_layer = []
         self.hidden_layers = []
         self.output_layer = []
+
+    def soft_max(self):
+        values = {}
+        # Calculate the exponentials of the output values
+        exp_values = np.exp([node.value for node in self.output_layer])
+
+        # Calculate the denominator (sum of exponentials)
+        denominator = np.sum(exp_values)
+
+        # Calculate softmax values
+        for i, node in enumerate(self.output_layer):
+            values[node.class_name] = exp_values[i] / denominator
+
+        self.soft_max_values = values
