@@ -7,7 +7,6 @@ class Node:
         self.bias = bias
         self.gradient_delta_value = 0
         self.class_name = None
-        self.sof
 
     def hyperbolic_tangent(self):
         """Calculate and return the hyperbolic tangent of the node's value."""
