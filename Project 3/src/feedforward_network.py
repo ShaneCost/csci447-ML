@@ -76,7 +76,7 @@ class FeedForwardNetwork:
     # fucntions for back_prop
     def forward(self, point):
         # Step 1: Set input layer values
-        for index, feature in enumerate(point[:-1]):  # Assuming the last element is the label
+        for index, feature in enumerate(point):  # Assuming the last element is the label
             self.node_set.input_layer[index].update_value(feature)
 
         # Step 2: Forward through hidden layers
@@ -89,7 +89,7 @@ class FeedForwardNetwork:
                     edges = self.edge_set.get_outgoing_edges(prev_node)
                     for edge in edges:
                         if edge.get_end() == current_node:  # Check if the edge leads to the current node
-                            input_sum += prev_node.activation() * edge.get_weight()  # Use activation of the previous node
+                            input_sum += prev_node.activation() * edge.get_weight()   # Use activation of the previous node
 
                 # Update the current node value and calculate its activation
                 input_sum += current_node.bias  # Add bias
@@ -111,6 +111,12 @@ class FeedForwardNetwork:
             # Update the output node value and calculate its activation
             input_sum += out_node.bias  # Add bias
             out_node.update_value(input_sum)  # Update node value
+
+            out_node.print_node()
+
+
+    def soft_max(self):
+        pass
 
     def loss(self, y_pred, y_true, type='cross_entropy'):
 
@@ -198,18 +204,19 @@ class FeedForwardNetwork:
         pass
 
 from root_data import *
+from meta_data import *
 
 def main():
-    data = RootData("Project 3\data\soybean-small.data", 'class')
+    data = RootData("Project 3\data\soybean-small.data")
 
-    training = data.get_training_set(1)
-    test = data.get_test_set(1)
+    training = MetaData(data.get_training_set(1))
+    test = MetaData(data.get_test_set(1))
 
     ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes)
 
-    ffn.train(epochs=100, learning_rate=0.01, batch_size=32)
-    ffn.forward(training[0])
-    print(training[-1])
+    # ffn.train(epochs=100, learning_rate=0.01, batch_size=32)
+    ffn.forward(training.feature_vectors[0])
+    # print(training[-1])
 
 
 main()
