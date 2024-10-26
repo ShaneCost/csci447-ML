@@ -5,7 +5,7 @@ from edge import *
 
 
 class FeedForwardNetwork:
-    def __init__(self, training_data, testing_data, num_hidden_layers, hidden_size, input_size, output_size, classes,
+    def __init__(self, training_data, testing_data, num_hidden_layers, hidden_size, input_size, output_size, classes, learning_rate,
                  is_class=True):
         self.training_data = training_data
         self.testing_data = testing_data
@@ -15,6 +15,8 @@ class FeedForwardNetwork:
         self.input_size = input_size
         self.output_size = output_size
         self.classes = classes
+        self.learning_rate = learning_rate
+
         self.node_set = NodeSet()
         self.edge_set = EdgeSet()
 
@@ -37,8 +39,9 @@ class FeedForwardNetwork:
 
         # Initialize output layer nodes
         output_layer = [Node(random.uniform(-0.1, 0.1)) for _ in range(self.output_size)]
-        for i in range(self.output_size):
-            output_layer[i].class_name = self.classes[i]
+        if self.is_class:
+            for i in range(self.output_size):
+                output_layer[i].class_name = self.classes[i]
         node_set.output_layer = output_layer
 
         # Initialize edges
@@ -50,11 +53,11 @@ class FeedForwardNetwork:
 
         elif self.num_hidden_layers == 1:
             for in_node in node_set.input_layer:
-                for h_node in node_set.hidden_layers:
+                for h_node in node_set.hidden_layers[0]:
                     edge = Edge(in_node, h_node, random.uniform(-0.1, 0.1))
                     edge_set.edges.append(edge)
 
-            for h_node in node_set.hidden_layers:
+            for h_node in node_set.hidden_layers[0]:
                 for out_node in node_set.output_layer:
                     edge = Edge(h_node, out_node, random.uniform(-0.1, 0.1))
                     edge_set.edges.append(edge)
@@ -93,7 +96,7 @@ class FeedForwardNetwork:
                 for edge in incoming_edges:
                     inp_value = (edge.weight * edge.start.value)
                     input_sum += inp_value
-                input_sum += current_node.bais
+                input_sum += current_node.bias
                 current_node.value = input_sum
                 current_node.activation()
 
@@ -104,114 +107,98 @@ class FeedForwardNetwork:
             for edge in incoming_edges:
                 inp_value = (edge.weight * edge.start.value)
                 input_sum += inp_value
-            input_sum += out_node.bais
+            input_sum += out_node.bias
             out_node.value = input_sum
 
         if self.is_class:
             self.node_set.soft_max()
+            prediction = max(self.node_set.soft_max_values, key=self.node_set.soft_max_values.get)
         else:
             self.node_set.linear_activation()
+            prediction = self.node_set.regression_output
 
+        return prediction
 
-    def loss(self, y_pred, y_true):
-
-        y_pred = np.array(y_pred, dtype=np.float64)
-        y_true = np.array(y_true, dtype=np.float64)
-
-        # cross_entropy loss
-        if type == 'cross_entropy':
-            loss = -np.sum(y_true * np.log(y_pred)) / y_true.shape[0]
-
-        # mean squared error loss
+    def loss(self, actual):
+        # Cross-Entropy Loss
+        if self.is_class:
+            # Ensure probabilities are between 0 and 1
+            predicted_probs = {k: np.clip(v, 1e-15, 1 - 1e-15) for k, v in self.node_set.soft_max_values.items()}
+            # Cross-entropy formula for multiclass classification
+            return -np.log(predicted_probs[actual])
+        # Mean Squared Error
         else:
-            loss = np.mean((y_true - y_pred) ** 2)
+            return (actual - self.node_set.regression_output) ** 2
 
-        return loss
+    def calc_error_values(self, prediction, actual):
+        if self.is_class:
+            for node in self.node_set.output_layer:
+                class_name = node.class_name
+                probability_value = self.node_set.soft_max_values[class_name]
+                if class_name == actual:
+                    gradient = probability_value - 1
+                else:
+                    gradient = probability_value
+                node.gradient_delta_value = gradient
+        else:
+            gradient = prediction - actual
+            self.node_set.output_layer[0].gradient_delta_value = gradient
 
-    def gradient_descent(self, mini_batch, learning_rate=0.01):
-        for point in mini_batch:
-            self.forward(point)
+        for layer in self.node_set.hidden_layers:
+            for node in layer:
+                total_error = 0
+                out_going_nodes = self.edge_set.get_outgoing_edges(node)
+                for edge in out_going_nodes:
+                    weight = edge.weight
+                    connecting_nodes_error = edge.end.gradient_delta_value
+                    derivative_function_value = 1 - np.tanh(node.value) ** 2
+                    error = weight * connecting_nodes_error * derivative_function_value
+                    total_error += error
+                node.gradient_delta_value = total_error
 
-        # Collect predictions for loss computation
-        y_preds = np.array([node.activation() for node in self.node_set.output_layer])
-        loss = self.loss(y_preds, np.array([point[-1] for point in mini_batch]))
+    def update_weights(self):
+        for edge in self.edge_set.edges:
+            start_activation = edge.start.activation()
+            end_error = edge.end.gradient_delta_value
+            weight = edge.weight
+            learning_rate = self.learning_rate
+            new_weight = weight - (learning_rate * start_activation * end_error)
+            edge.update_weight(new_weight)
 
-        self.back_prop(mini_batch, learning_rate)
 
-        return loss
-
-    # funcrions to be used to train and test
-    def back_prop(self, mini_batch, learning_rate):
-        output_layer_gradients = []
-        for i, point in enumerate(mini_batch):
-            y_pred = [node.activation() for node in self.node_set.output_layer]
-            if self.is_class:
-                gradient = y_pred - point[-1]
-            else:
-                gradient = 2 * (y_pred - point[-1]) / len(mini_batch)
-
-            output_layer_gradients.append(gradient)
-
-            for out_node in self.node_set.output_layer:
-                for h_node in self.node_set.hidden_layers[-1]:
-                    edge = self.edge_set.get_edge(h_node, out_node)
-                    if edge:
-                        weight_update = learning_rate * gradient * h_node.activation()
-                        edge.update_weight(edge.get_weight() - weight_update)
-
-                out_node.bias -= learning_rate * gradient
-
-        # Backpropagate through hidden layers
-        for layer_index in reversed(range(len(self.node_set.hidden_layers))):
-            layer = self.node_set.hidden_layers[layer_index]
-            next_layer_gradients = output_layer_gradients if layer_index == len(self.node_set.hidden_layers) - 1 else []
-
-            for h_node in layer:
-                gradient = sum(next_layer_gradients)
-
-                for prev_node in self.node_set.hidden_layers[
-                    layer_index - 1] if layer_index > 0 else self.node_set.input_layer:
-                    edge = self.edge_set.get_edge(prev_node, h_node)
-                    if edge:
-                        weight_update = learning_rate * gradient * prev_node.activation()
-                        edge.update_weight(edge.get_weight() - weight_update)
-
-                h_node.bias -= learning_rate * gradient
-
-    # training and testing the FFN
-    def train(self, epochs=100, learning_rate=0.01, batch_size=32):
-        num_samples = len(self.training_data)
-        labels = np.array([point[-1] for point in self.training_data])
-        # labels1 = self.training_data.traget_vector
-
-        for epoch in range(epochs):
-            np.random.shuffle(self.training_data)  # Shuffle data each epoch
-            for start in range(0, num_samples, batch_size):
-                end = start + batch_size
-                mini_batch = self.training_data[start:end]
-                # Update mini_batch with one-hot encoded labels
-                loss = self.gradient_descent(mini_batch, learning_rate)
-            print(f'Epoch {epoch + 1}/{epochs}, Loss: {loss}')
-
-    def test(self):
-        pass
-
+    def train(self):
+        i = 0
+        correct = 0
+        for point in self.training_data.feature_vectors:
+            prediction = self.forward(point) # push a point forward through the graph
+            actual = self.training_data.target_vector[i] # get actual value
+            loss_function_value = self.loss(actual) # derive value of loss function
+            self.calc_error_values(prediction, actual) # calculate the error at the output layer
+            self.update_weights()
+            # print("actual:", actual)
+            # print("predicted:", prediction)
+            # print("loss:", loss_function_value)
+            # print("\n")
+            if actual == prediction:
+                correct += 1
+            i += 1
+        return correct
 
 from root_data import *
 from meta_data import *
 
-
 def main():
-    data = RootData("Project 3\data\soybean-small.data")
+    for i in range(100):
+        folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        data = RootData("../data/soybean-small.data")
 
-    training = MetaData(data.get_training_set(1))
-    test = MetaData(data.get_test_set(1))
+        for fold in folds:
 
-    ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes)
+            training = MetaData(data.get_training_set(fold))
+            test = MetaData(data.get_test_set(fold))
 
-    ffn.train(epochs=100, learning_rate=0.01, batch_size=32)
-    ffn.forward(training[0])
-    print(training[-1])
+            ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01)
 
+            print(ffn.train())
 
 main()

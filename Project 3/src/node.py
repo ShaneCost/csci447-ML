@@ -16,10 +16,10 @@ class Node:
         self.bias = new_bias
     
     def update_value(self, new_value):
-        self.value = new_value
+        self.value = float(new_value)
     
     def print_node(self):
-        print(f"Node: value={self.value}, bias={self.bias}, gradient_delta={self.gradient_delta_value}, activation={self.activation_value}")
+        print(f"Node: value={self.value}, bias={self.bias}, gradient_delta={self.gradient_delta_value}")
     
     def print_output(self):
         print(f"Node: value={self.value * self.bias}")
@@ -36,6 +36,7 @@ class NodeSet:
         self.hidden_layers = []
         self.output_layer = []
         self.soft_max_values = {}
+        self.regression_output = 0
 
     def soft_max(self):
         values = {}
@@ -50,3 +51,6 @@ class NodeSet:
             values[node.class_name] = exp_values[i] / denominator
 
         self.soft_max_values = values
+
+    def linear_activation(self):
+        self.regression_output = math.tanh(self.output_layer[0].value)
