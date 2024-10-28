@@ -17,7 +17,10 @@ class FeedForwardNetwork:
         self.hidden_size = hidden_size
         self.is_class = is_class
         self.input_size = input_size
-        self.output_size = output_size
+        if is_class:
+            self.output_size = output_size
+        else:
+            self.output_size = 1
         self.classes = classes
         self.learning_rate = learning_rate
 

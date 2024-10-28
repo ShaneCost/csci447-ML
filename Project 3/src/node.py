@@ -19,7 +19,7 @@ class Node:
         self.value = float(new_value)
     
     def print_node(self):
-        print(f"Node: value={self.value}, bias={self.bias}, gradient_delta={self.gradient_error_value}")
+        print(f"Node: value={self.value}, bias={self.bias}, gradient_delta={self.gradient_value}")
     
     def print_output(self):
         print(f"Node: value={self.value * self.bias}")

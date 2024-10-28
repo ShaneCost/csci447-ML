@@ -3,7 +3,7 @@ from root_data import *
 from meta_data import *
 from feedforward_shane import *
 
-def tune(data):
+def tune(data, num_hidden_layers):
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     num_nodes = data.hyperparameters['num_nodes']
@@ -15,7 +15,7 @@ def tune(data):
         for fold in folds:
             training = MetaData(data.get_training_set(fold))
             testing = MetaData(data.tuning)
-            ffn = FeedForwardNetwork(training, testing, 1, int(num_nodes.value), data.num_features, data.num_classes, data.classes, 0.01, data.is_class)
+            ffn = FeedForwardNetwork(training, testing, num_hidden_layers, int(num_nodes.value), data.num_features, data.num_classes, data.classes, 0.01, data.is_class)
             ffn.train()
             ffn.test()
             # score += random.randint(-5, 5)
@@ -44,6 +44,7 @@ def tune(data):
         batch_size.update(score)
 
 def main():
+    num_hidden_layers = [0, 1, 2]
     # All data set used for classification problems
     classification = ["../data/breast-cancer-wisconsin.data", "../data/glass.data", "../data/soybean-small.data"]
     # All data set used for regression problems
@@ -51,10 +52,12 @@ def main():
 
     for file in classification:
         data = RootData(file)
-        tune(data)
+        for layer_size in num_hidden_layers:
+            tune(data, layer_size)
 
     for file in regression:
         data = RootData(file, False)
-        tune(data)
+        for layer_size in num_hidden_layers:
+            tune(data, layer_size)
 
 main()
