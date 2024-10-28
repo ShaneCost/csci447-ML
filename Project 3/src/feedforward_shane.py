@@ -131,7 +131,7 @@ class FeedForwardNetwork:
         else:
             return ((actual - self.node_set.regression_output) ** 2) / 2
 
-    def calc_hidden_error(self, prediction, actual):
+    def calc_output_error(self, prediction, actual):
         if self.is_class:
             for node in self.node_set.output_layer:
                 class_name = node.class_name
@@ -164,7 +164,7 @@ class FeedForwardNetwork:
                 actual = self.training_data.target_vector[i] # get actual value
                 loss_function_value = self.loss(actual) # derive value of loss function
                 # Back Prop
-                self.calc_hidden_error(prediction, actual) # calculate the error at the output layer
+                self.calc_output_error(prediction, actual) # calculate the error at the output layer
                 self.update_weights()
                 if actual == prediction:
                     correct += 1
