@@ -156,6 +156,7 @@ class FeedForwardNetwork:
                 total_error = 0
                 for edge in outgoing_edges:
                     total_error += edge.weight * edge.end.gradient_value
+                delta = total_error * derivative_function(node.value)
 
     # def update_weights(self):
     #     for edge in self.edge_set.edges:
@@ -175,13 +176,14 @@ class FeedForwardNetwork:
                 prediction = self.forward(point) # push a point forward through the graph
                 actual = self.training_data.target_vector[i] # get actual value
                 loss_function_value = self.loss(actual) # derive value of loss function
+
                 # Back Prop
                 self.calc_output_error(prediction, actual) # calculate the error at the output layer
                 # self.update_weights()
                 if actual == prediction:
                     correct += 1
                 i += 1
-            print (round((correct / len(self.training_data.feature_vectors)) * 100, 2))
+            # print (round((correct / len(self.training_data.feature_vectors)) * 100, 2))
 
     def test(self):
         i = 0
