@@ -1,6 +1,7 @@
 import random
 from root_data import *
 from meta_data import *
+from feedforward_shane import *
 
 def tune(data):
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -14,9 +15,14 @@ def tune(data):
         for fold in folds:
             training = MetaData(data.get_training_set(fold))
             testing = MetaData(data.tuning)
-            score += random.randint(-5, 5)
+            ffn = FeedForwardNetwork(training, testing, 1, int(num_nodes.value), data.num_features, data.num_classes, data.classes, 0.01)
+            score += ffn.train()
+            # score += random.randint(-5, 5)
         score /= 10
         num_nodes.update(score)
+        print(score)
+
+    print(num_nodes.value)
 
     while not learning_rate.is_tuned:
         score = 0

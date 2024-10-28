@@ -175,30 +175,38 @@ class FeedForwardNetwork:
             loss_function_value = self.loss(actual) # derive value of loss function
             self.calc_error_values(prediction, actual) # calculate the error at the output layer
             self.update_weights()
-            # print("actual:", actual)
-            # print("predicted:", prediction)
-            # print("loss:", loss_function_value)
-            # print("\n")
             if actual == prediction:
                 correct += 1
             i += 1
-        return correct
+        return round((correct / len(self.training_data.feature_vectors)) * 100, 2)
 
 from root_data import *
 from meta_data import *
 
 def main():
-    for i in range(100):
+
+    for i in range(1000):
         folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         data = RootData("../data/soybean-small.data")
-
+        avg = 0
+        min_v = 100
+        max_v = 0
         for fold in folds:
 
             training = MetaData(data.get_training_set(fold))
             test = MetaData(data.get_test_set(fold))
 
             ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01)
+            performance = ffn.train()
+            avg += performance
+            if performance > max_v:
+                max_v = performance
+            if performance < min_v:
+                min_v = performance
 
-            print(ffn.train())
+        print("avg: ", round(avg/10, 2))
+        print("min: ", min_v)
+        print("max: ", max_v)
+        print('\n ')
 
-main()
+# main()
