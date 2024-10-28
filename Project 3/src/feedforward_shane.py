@@ -128,33 +128,21 @@ class FeedForwardNetwork:
             return -np.log(predicted_probs[actual])
         # Mean Squared Error
         else:
-            return (actual - self.node_set.regression_output) ** 2
+            return ((actual - self.node_set.regression_output) ** 2) / 2
 
-    def calc_error_values(self, prediction, actual):
+    def calc_hidden_error(self, prediction, actual):
         if self.is_class:
             for node in self.node_set.output_layer:
                 class_name = node.class_name
                 probability_value = self.node_set.soft_max_values[class_name]
                 if class_name == actual:
-                    gradient = probability_value - 1
+                    gradient = ((1 - probability_value) ** 2) / 2
                 else:
-                    gradient = probability_value
-                node.gradient_delta_value = gradient
+                    gradient = ((0 - probability_value) ** 2) / 2
+                node.gradient_error_value = gradient
         else:
-            gradient = prediction - actual
-            self.node_set.output_layer[0].gradient_delta_value = gradient
-
-        for layer in self.node_set.hidden_layers:
-            for node in layer:
-                total_error = 0
-                out_going_nodes = self.edge_set.get_outgoing_edges(node)
-                for edge in out_going_nodes:
-                    weight = edge.weight
-                    connecting_nodes_error = edge.end.gradient_delta_value
-                    derivative_function_value = 1 - np.tanh(node.value) ** 2
-                    error = weight * connecting_nodes_error * derivative_function_value
-                    total_error += error
-                node.gradient_delta_value = total_error
+            gradient = ((actual - prediction) ** 2) / 2
+            self.node_set.output_layer[0].gradient_error_value = gradient
 
     def update_weights(self):
         for edge in self.edge_set.edges:
@@ -162,7 +150,7 @@ class FeedForwardNetwork:
             end_error = edge.end.gradient_delta_value
             weight = edge.weight
             learning_rate = self.learning_rate
-            new_weight = weight - (learning_rate * start_activation * end_error)
+            new_weight = weight + - learning_rate  # error)
             edge.update_weight(new_weight)
 
 
@@ -173,12 +161,19 @@ class FeedForwardNetwork:
             prediction = self.forward(point) # push a point forward through the graph
             actual = self.training_data.target_vector[i] # get actual value
             loss_function_value = self.loss(actual) # derive value of loss function
-            self.calc_error_values(prediction, actual) # calculate the error at the output layer
+            self.calc_hidden_error(prediction, actual) # calculate the error at the output layer
             self.update_weights()
             if actual == prediction:
                 correct += 1
             i += 1
         return round((correct / len(self.training_data.feature_vectors)) * 100, 2)
+
+    def test(self):
+        i = 0
+        for point in self.testing_data.feature_vectors:
+            prediction = self.forward(point)
+            actual = self.testing_data.target_vector[i]
+            i += 1
 
 from root_data import *
 from meta_data import *

@@ -5,7 +5,7 @@ class Node:
     def __init__(self, bias):
         self.value = 0
         self.bias = bias
-        self.gradient_delta_value = 0
+        self.gradient_error_value = 0
         self.class_name = None
 
     def hyperbolic_tangent(self):
@@ -19,7 +19,7 @@ class Node:
         self.value = float(new_value)
     
     def print_node(self):
-        print(f"Node: value={self.value}, bias={self.bias}, gradient_delta={self.gradient_delta_value}")
+        print(f"Node: value={self.value}, bias={self.bias}, gradient_delta={self.gradient_error_value}")
     
     def print_output(self):
         print(f"Node: value={self.value * self.bias}")

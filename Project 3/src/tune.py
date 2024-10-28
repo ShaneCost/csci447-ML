@@ -15,8 +15,9 @@ def tune(data):
         for fold in folds:
             training = MetaData(data.get_training_set(fold))
             testing = MetaData(data.tuning)
-            ffn = FeedForwardNetwork(training, testing, 1, int(num_nodes.value), data.num_features, data.num_classes, data.classes, 0.01)
-            score += ffn.train()
+            ffn = FeedForwardNetwork(training, testing, 1, int(num_nodes.value), data.num_features, data.num_classes, data.classes, 0.01, data.is_class)
+            ffn.train()
+            ffn.test()
             # score += random.randint(-5, 5)
         score /= 10
         num_nodes.update(score)
@@ -51,7 +52,6 @@ def main():
     for file in classification:
         data = RootData(file)
         tune(data)
-
 
     for file in regression:
         data = RootData(file, False)
