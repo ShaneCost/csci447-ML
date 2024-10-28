@@ -164,7 +164,6 @@ class FeedForwardNetwork:
     def train(self):
        for epoch in range(EPOCHS):
             cur = 0
-
             for point in self.training_data.feature_vectors:
                 prediction = self.forward(point) # push a point forward through the graph
                 actual = self.training_data.target_vector[cur] # get actual value
