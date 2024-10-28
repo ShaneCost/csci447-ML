@@ -137,11 +137,8 @@ class FeedForwardNetwork:
     def calc_output_error(self, prediction, actual):
         if self.is_class:
             for node in self.node_set.output_layer:
-                class_name = node.class_name
-                if class_name == actual:
-                    error = ((1 - node.value) ** 2) / 2
-                else:
-                    error = ((0 - node.value) ** 2) / 2
+                target = 1 if node.class_name == actual else 0
+                error = ((target - node.value) ** 2) / 2
                 delta = error * derivative_function(node.value)
                 node.gradient_value = delta
         else:
@@ -149,48 +146,48 @@ class FeedForwardNetwork:
             delta = error * derivative_function(prediction)
             self.node_set.output_layer[0].gradient_value = delta
 
-    def hidden_layer_back(self):
-        for layer in self.node_set.hidden_layers:
-            for node in layer:
-                outgoing_edges = self.edge_set.get_incoming_edges(node)
-                total_error = 0
+   # TODO: Finish this function to walk back through the graph, updating weights and biases
+    def walk_back(self):
+        for layer in reversed(self.node_set.hidden_layers): # walk through layers backward
+            for node in layer: # look at each node
+                outgoing_edges = self.edge_set.get_outgoing_edges(node) # get all edges leaving that node
                 for edge in outgoing_edges:
-                    total_error += edge.weight * edge.end.gradient_value
-                delta = total_error * derivative_function(node.value)
+                    output_node_delta = edge.end.gradient_value # get the delta value of all connected output nodes
+                # TODO: Find how to update weight + bias at each node, using the output nodes delta value calculated in calc_output_error()
 
-    # def update_weights(self):
-    #     for edge in self.edge_set.edges:
-    #         start_activation = edge.start.activation()
-    #         end_error = edge.end.gradient_value
-    #         weight = edge.weight
-    #         learning_rate = self.learning_rate
-    #         new_weight = weight + - learning_rate  # error)
-    #         edge.update_weight(new_weight)
+        # TODO: Handle input layers, consider case of 0 hidden layers
+        for layer in self.node_set.input_layer:
+            for node in layer:
+                pass
 
 
     def train(self):
        for epoch in range(EPOCHS):
-            i = 0
-            correct = 0
+            cur = 0
+
             for point in self.training_data.feature_vectors:
                 prediction = self.forward(point) # push a point forward through the graph
-                actual = self.training_data.target_vector[i] # get actual value
+                actual = self.training_data.target_vector[cur] # get actual value
                 loss_function_value = self.loss(actual) # derive value of loss function
 
-                # Back Prop
+                # TODO: Back Prop
                 self.calc_output_error(prediction, actual) # calculate the error at the output layer
-                # self.update_weights()
-                if actual == prediction:
-                    correct += 1
-                i += 1
-            # print (round((correct / len(self.training_data.feature_vectors)) * 100, 2))
+                self.walk_back()
+                # --------------------
+
+                cur += 1
 
     def test(self):
         i = 0
+        prediction = []
+        actual = []
         for point in self.testing_data.feature_vectors:
-            prediction = self.forward(point)
-            actual = self.testing_data.target_vector[i]
+            predict = self.forward(point)
+            act = self.testing_data.target_vector[i]
+            prediction.append(predict)
+            actual.append(act)
             i += 1
+        return prediction, actual
 
 from root_data import *
 from meta_data import *
@@ -208,6 +205,7 @@ def main():
 
             ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01)
             ffn.train()
+            prediction, actual = ffn.test()
 
 
 
