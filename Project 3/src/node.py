@@ -5,7 +5,7 @@ class Node:
     def __init__(self, bias):
         self.value = 0
         self.bias = bias
-        self.gradient_error_value = 0
+        self.gradient_value = 0
         self.class_name = None
 
     def hyperbolic_tangent(self):
@@ -48,9 +48,13 @@ class NodeSet:
 
         # Calculate softmax values
         for i, node in enumerate(self.output_layer):
-            values[node.class_name] = exp_values[i] / denominator
+            output = exp_values[i] / denominator
+            values[node.class_name] = output
+            node.value = output
 
         self.soft_max_values = values
 
     def linear_activation(self):
-        self.regression_output = math.tanh(self.output_layer[0].value)
+        output = math.tanh(self.output_layer[0].value)
+        self.regression_output = output
+        self.output_layer[0].value = output

@@ -5,6 +5,9 @@ from edge import *
 
 EPOCHS = 1000
 
+def derivative_function (value):
+    return 1 - np.tanh(value) ** 2
+
 class FeedForwardNetwork:
     def __init__(self, training_data, testing_data, num_hidden_layers, hidden_size, input_size, output_size, classes, learning_rate,
                  is_class=True):
@@ -135,24 +138,33 @@ class FeedForwardNetwork:
         if self.is_class:
             for node in self.node_set.output_layer:
                 class_name = node.class_name
-                probability_value = self.node_set.soft_max_values[class_name]
                 if class_name == actual:
-                    gradient = ((1 - probability_value) ** 2) / 2
+                    error = ((1 - node.value) ** 2) / 2
                 else:
-                    gradient = ((0 - probability_value) ** 2) / 2
-                node.gradient_error_value = gradient
+                    error = ((0 - node.value) ** 2) / 2
+                delta = error * derivative_function(node.value)
+                node.gradient_value = delta
         else:
-            gradient = ((actual - prediction) ** 2) / 2
-            self.node_set.output_layer[0].gradient_error_value = gradient
+            error = ((actual - prediction) ** 2) / 2
+            delta = error * derivative_function(prediction)
+            self.node_set.output_layer[0].gradient_value = delta
 
-    def update_weights(self):
-        for edge in self.edge_set.edges:
-            start_activation = edge.start.activation()
-            end_error = edge.end.gradient_delta_value
-            weight = edge.weight
-            learning_rate = self.learning_rate
-            new_weight = weight + - learning_rate  # error)
-            edge.update_weight(new_weight)
+    def hidden_layer_back(self):
+        for layer in self.node_set.hidden_layers:
+            for node in layer:
+                outgoing_edges = self.edge_set.get_incoming_edges(node)
+                total_error = 0
+                for edge in outgoing_edges:
+                    total_error += edge.weight * edge.end.gradient_value
+
+    # def update_weights(self):
+    #     for edge in self.edge_set.edges:
+    #         start_activation = edge.start.activation()
+    #         end_error = edge.end.gradient_value
+    #         weight = edge.weight
+    #         learning_rate = self.learning_rate
+    #         new_weight = weight + - learning_rate  # error)
+    #         edge.update_weight(new_weight)
 
 
     def train(self):
@@ -165,7 +177,7 @@ class FeedForwardNetwork:
                 loss_function_value = self.loss(actual) # derive value of loss function
                 # Back Prop
                 self.calc_output_error(prediction, actual) # calculate the error at the output layer
-                self.update_weights()
+                # self.update_weights()
                 if actual == prediction:
                     correct += 1
                 i += 1
@@ -182,7 +194,6 @@ from root_data import *
 from meta_data import *
 
 def main():
-
         folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         data = RootData("../data/soybean-small.data")
         avg = 0
@@ -196,9 +207,6 @@ def main():
             ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01)
             ffn.train()
 
-        print("avg: ", round(avg/10, 2))
-        print("min: ", min_v)
-        print("max: ", max_v)
-        print('\n ')
 
-# main()
+
+main()
