@@ -215,3 +215,8 @@ def main():
 
 
 main()
+
+## error for (actual - predicted **1/2 )/2 - regression
+## error for (cross_entropy)
+# -- update actual - predicted * input
+#-- predicted error for soft_max 

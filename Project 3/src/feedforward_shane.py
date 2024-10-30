@@ -150,34 +150,75 @@ class FeedForwardNetwork:
             self.node_set.output_layer[0].gradient_value = delta
 
    # TODO: Finish this function to walk back through the graph, updating weights and biases
+    # def walk_back(self):
+    #     for layer in reversed(self.node_set.hidden_layers): # walk through layers backward
+    #         for node in layer: # look at each node
+    #             outgoing_edges = self.edge_set.get_outgoing_edges(node) # get all edges leaving that node
+    #             for edge in outgoing_edges:
+    #                 output_node_delta = edge.end.gradient_value # get the delta value of all connected output nodes
+    #             # TODO: Find how to update weight + bias at each node, using the output nodes delta value calculated in calc_output_error()
+    #                 edge.weight = self.learning_rate * node.gradient_value * edge.start.value
+
+    #     # TODO: Handle input layers, consider case of 0 hidden layers
+    #     for layer in self.node_set.input_layer:
+    #         for node in layer:
+    #             pass
+
     def walk_back(self):
-        for layer in reversed(self.node_set.hidden_layers): # walk through layers backward
-            for node in layer: # look at each node
-                outgoing_edges = self.edge_set.get_outgoing_edges(node) # get all edges leaving that node
-                for edge in outgoing_edges:
-                    output_node_delta = edge.end.gradient_value # get the delta value of all connected output nodes
-                # TODO: Find how to update weight + bias at each node, using the output nodes delta value calculated in calc_output_error()
+        # Handle output layer first
+        for node in self.node_set.output_layer:
+            outgoing_edges = self.edge_set.get_outgoing_edges(node)
+            for edge in outgoing_edges:
+                # Update the weight
+                edge.weight += self.learning_rate * node.gradient_value * edge.start.value
+                
+                # Update the bias
+                node.bias += self.learning_rate * node.gradient_value
 
-        # TODO: Handle input layers, consider case of 0 hidden layers
-        for layer in self.node_set.input_layer:
+        # Handle hidden layers
+        for layer in reversed(self.node_set.hidden_layers):
             for node in layer:
-                pass
+                outgoing_edges = self.edge_set.get_outgoing_edges(node)
+                total_delta = 0
+                for edge in outgoing_edges:
+                    # Make sure edge.end refers to the correct node (the one receiving the gradient)
+                    total_delta += edge.end.gradient_value * edge.weight
+                
+                # Calculate gradient for current node
+                node.gradient_value = total_delta * derivative_function(node.value)
 
+                # Update weights and bias for incoming edges
+                incoming_edges = self.edge_set.get_incoming_edges(node)
+                for edge in incoming_edges:
+                    edge.weight += self.learning_rate * node.gradient_value * edge.start.value
+
+                # Update the bias for the current node
+                node.bias += self.learning_rate * node.gradient_value
+
+        # Handle input layer only if no hidden layers
+        if self.num_hidden_layers == 0:
+            for node in self.node_set.input_layer:
+                # Typically, input nodes do not have weights to update
+                pass  # No updates needed for input nodes
 
     def train(self):
-       for epoch in range(EPOCHS):
-            cur = 0
-            for point in self.training_data.feature_vectors:
-                prediction = self.forward(point) # push a point forward through the graph
-                actual = self.training_data.target_vector[cur] # get actual value
-                loss_function_value = self.loss(actual) # derive value of loss function
+        for epoch in range(EPOCHS):
+            for cur, point in enumerate(self.training_data.feature_vectors):
+                prediction = self.forward(point)  # push a point forward through the graph
+                actual = self.training_data.target_vector[cur]  # get actual value
+                loss_function_value = self.loss(actual)  # derive value of loss function
 
-                # TODO: Back Prop
-                self.calc_output_error(prediction, actual) # calculate the error at the output layer
-                self.walk_back()
-                # --------------------
+                # Back Propagation
+                self.calc_output_error(prediction, actual)  # calculate the error at the output layer
+                self.walk_back()  # update weights and biases
 
-                cur += 1
+                # If you want to track loss, you could accumulate it here
+                # total_loss += loss_function_value
+
+            # Optionally log average loss per epoch here
+            # print(f"Epoch {epoch}: Average Loss = {total_loss / len(self.training_data.feature_vectors):.4f}")
+
+
 
     def test(self):
         i = 0
@@ -196,7 +237,9 @@ from meta_data import *
 
 def main():
         folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        data = RootData("../data/soybean-small.data")
+        data = RootData("Project 3\data\soybean-small.data")
+        total_correct = 0
+        total_predictions = 0
         avg = 0
         min_v = 100
         max_v = 0
@@ -207,7 +250,20 @@ def main():
 
             ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01)
             ffn.train()
+
             prediction, actual = ffn.test()
+
+            correct_predictions = sum(1 for pred, act in zip(prediction, actual) if pred == act)
+            total_correct += correct_predictions
+            total_predictions += len(actual)
+
+             # Print results for each fold
+            print(f"Fold {fold}: Accuracy = {correct_predictions}/{len(actual)} ({(correct_predictions / len(actual)) * 100:.2f}%)")
+
+         # Calculate and print total accuracy across all folds
+        total_accuracy = total_correct / total_predictions * 100 if total_predictions > 0 else 0
+        print(f"Total Accuracy across all folds: {total_accuracy:.2f}%")
+                
 
 
 
