@@ -5,10 +5,8 @@ from edge import *
 
 EPOCHS = 1000
 
-
 def derivative_function(value):
     return 1 - np.tanh(value) ** 2
-
 
 class FeedForwardNetwork:
     def __init__(self, training_data, testing_data, num_hidden_layers, hidden_size, input_size, output_size, classes,
@@ -268,4 +266,4 @@ def main():
     print(f"Total Accuracy across all folds: {total_accuracy:.2f}%")
 
 
-main()
+# main()
