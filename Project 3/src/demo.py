@@ -47,7 +47,6 @@ tuned_hyperparameters = {
     }
 }
 
-
 def main():
     classification = ["Project 3\data\soybean-small.data","Project 3\data\\breast-cancer-wisconsin.data", "Project 3\data\glass.data"]
     regression = ["Project 3\data\\forestfires.data", "Project 3\data\machine.data", "Project 3\data\\abalone.data", ]

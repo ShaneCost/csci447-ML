@@ -55,8 +55,6 @@ class NodeSet:
         self.soft_max_values = values
 
     def linear_activation(self):
-        # output = math.tanh(self.output_layer[0].value)
         output = self.output_layer[0].value
-        # print(output)
         self.regression_output = output
         self.output_layer[0].value = output

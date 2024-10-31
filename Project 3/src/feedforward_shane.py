@@ -207,6 +207,7 @@ class FeedForwardNetwork:
             for cur, point in enumerate(self.training_data.feature_vectors):
                 prediction = self.forward(point)  # push a point forward through the graph
                 actual = self.training_data.target_vector[cur]  # get actual value
+                actual = float(actual) if not self.is_class else actual
                 loss_function_value = self.loss(actual)  # derive value of loss function
 
                 # Back Propagation
@@ -238,7 +239,8 @@ from meta_data import *
 
 def main():
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    data = RootData("Project 3\data\soybean-small.data")
+    # data = RootData("Project 3\data\soybean-small.data")
+    data = RootData("../data/glass.data", True)
     total_correct = 0
     total_predictions = 0
     avg = 0
@@ -248,7 +250,7 @@ def main():
         training = MetaData(data.get_training_set(fold))
         test = MetaData(data.get_test_set(fold))
 
-        ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01)
+        ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01, data.is_class)
         ffn.train()
 
         prediction, actual = ffn.test()
@@ -266,4 +268,4 @@ def main():
     print(f"Total Accuracy across all folds: {total_accuracy:.2f}%")
 
 
-# main()
+main()

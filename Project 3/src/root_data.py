@@ -95,6 +95,7 @@ class RootData:
                 self.regress_stratified_ten_fold()
 
             good_folds = self.check_folds()
+            # self.print_ten_folds()
 
         # Create instances of Hyperparameter class
         self.hyperparameters['num_nodes'] = Hyperparameter('num_nodes', 1, 100)
@@ -364,6 +365,7 @@ class RootData:
         if max(folds) * .80 <= min(folds):
             return True
         else:
+
             return False
 
     def get_training_set(self, test_set_num):
