@@ -42,3 +42,11 @@ class EdgeSet:
                 outgoing_edges.append(edge)
 
         return outgoing_edges
+
+    def print_weights(self):
+        string = ""
+        for edge in self.edges:
+            string += " "
+            string += str(edge.get_weight())
+            string += " "
+        print(string)

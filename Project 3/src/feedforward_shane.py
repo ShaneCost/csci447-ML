@@ -5,11 +5,14 @@ from edge import *
 
 EPOCHS = 1000
 
-def derivative_function (value):
+
+def derivative_function(value):
     return 1 - np.tanh(value) ** 2
 
+
 class FeedForwardNetwork:
-    def __init__(self, training_data, testing_data, num_hidden_layers, hidden_size, input_size, output_size, classes, learning_rate,
+    def __init__(self, training_data, testing_data, num_hidden_layers, hidden_size, input_size, output_size, classes,
+                 learning_rate,
                  is_class=True):
         self.training_data = training_data
         self.testing_data = testing_data
@@ -149,7 +152,7 @@ class FeedForwardNetwork:
             delta = error * derivative_function(prediction)
             self.node_set.output_layer[0].gradient_value = delta
 
-   # TODO: Finish this function to walk back through the graph, updating weights and biases
+    # TODO: Finish this function to walk back through the graph, updating weights and biases
     # def walk_back(self):
     #     for layer in reversed(self.node_set.hidden_layers): # walk through layers backward
     #         for node in layer: # look at each node
@@ -171,7 +174,7 @@ class FeedForwardNetwork:
             for edge in outgoing_edges:
                 # Update the weight
                 edge.weight += self.learning_rate * node.gradient_value * edge.start.value
-                
+
                 # Update the bias
                 node.bias += self.learning_rate * node.gradient_value
 
@@ -183,7 +186,7 @@ class FeedForwardNetwork:
                 for edge in outgoing_edges:
                     # Make sure edge.end refers to the correct node (the one receiving the gradient)
                     total_delta += edge.end.gradient_value * edge.weight
-                
+
                 # Calculate gradient for current node
                 node.gradient_value = total_delta * derivative_function(node.value)
 
@@ -218,8 +221,6 @@ class FeedForwardNetwork:
             # Optionally log average loss per epoch here
             # print(f"Epoch {epoch}: Average Loss = {total_loss / len(self.training_data.feature_vectors):.4f}")
 
-
-
     def test(self):
         i = 0
         prediction = []
@@ -232,39 +233,39 @@ class FeedForwardNetwork:
             i += 1
         return prediction, actual
 
+
 from root_data import *
 from meta_data import *
 
+
 def main():
-        folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        data = RootData("Project 3\data\soybean-small.data")
-        total_correct = 0
-        total_predictions = 0
-        avg = 0
-        min_v = 100
-        max_v = 0
-        for fold in folds:
+    folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    data = RootData("Project 3\data\soybean-small.data")
+    total_correct = 0
+    total_predictions = 0
+    avg = 0
+    min_v = 100
+    max_v = 0
+    for fold in folds:
+        training = MetaData(data.get_training_set(fold))
+        test = MetaData(data.get_test_set(fold))
 
-            training = MetaData(data.get_training_set(fold))
-            test = MetaData(data.get_test_set(fold))
+        ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01)
+        ffn.train()
 
-            ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01)
-            ffn.train()
+        prediction, actual = ffn.test()
 
-            prediction, actual = ffn.test()
+        correct_predictions = sum(1 for pred, act in zip(prediction, actual) if pred == act)
+        total_correct += correct_predictions
+        total_predictions += len(actual)
 
-            correct_predictions = sum(1 for pred, act in zip(prediction, actual) if pred == act)
-            total_correct += correct_predictions
-            total_predictions += len(actual)
+        # Print results for each fold
+        print(
+            f"Fold {fold}: Accuracy = {correct_predictions}/{len(actual)} ({(correct_predictions / len(actual)) * 100:.2f}%)")
 
-             # Print results for each fold
-            print(f"Fold {fold}: Accuracy = {correct_predictions}/{len(actual)} ({(correct_predictions / len(actual)) * 100:.2f}%)")
-
-         # Calculate and print total accuracy across all folds
-        total_accuracy = total_correct / total_predictions * 100 if total_predictions > 0 else 0
-        print(f"Total Accuracy across all folds: {total_accuracy:.2f}%")
-                
-
+    # Calculate and print total accuracy across all folds
+    total_accuracy = total_correct / total_predictions * 100 if total_predictions > 0 else 0
+    print(f"Total Accuracy across all folds: {total_accuracy:.2f}%")
 
 
 main()
