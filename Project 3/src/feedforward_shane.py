@@ -237,35 +237,36 @@ from root_data import *
 from meta_data import *
 
 
-def main():
-    folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    # data = RootData("Project 3\data\soybean-small.data")
-    data = RootData("../data/glass.data", True)
-    total_correct = 0
-    total_predictions = 0
-    avg = 0
-    min_v = 100
-    max_v = 0
-    for fold in folds:
-        training = MetaData(data.get_training_set(fold))
-        test = MetaData(data.get_test_set(fold))
+# def main():
+#     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+#     # data = RootData("Project 3\data\soybean-small.data")
+#     data = RootData("Project 3\data\soybean-small.data", True)
+#     total_correct = 0
+#     total_predictions = 0
+#     avg = 0
+#     min_v = 100
+#     max_v = 0
 
-        ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01, data.is_class)
-        ffn.train()
+#     for fold in folds:
+#         training = MetaData(data.get_training_set(fold))
+#         test = MetaData(data.get_test_set(fold))
 
-        prediction, actual = ffn.test()
+#         ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01)
+#         ffn.train()
 
-        correct_predictions = sum(1 for pred, act in zip(prediction, actual) if pred == act)
-        total_correct += correct_predictions
-        total_predictions += len(actual)
+#         prediction, actual = ffn.test()
 
-        # Print results for each fold
-        print(
-            f"Fold {fold}: Accuracy = {correct_predictions}/{len(actual)} ({(correct_predictions / len(actual)) * 100:.2f}%)")
+#         correct_predictions = sum(1 for pred, act in zip(prediction, actual) if pred == act)
+#         total_correct += correct_predictions
+#         total_predictions += len(actual)
 
-    # Calculate and print total accuracy across all folds
-    total_accuracy = total_correct / total_predictions * 100 if total_predictions > 0 else 0
-    print(f"Total Accuracy across all folds: {total_accuracy:.2f}%")
+#         # Print results for each fold
+#         print(
+#             f"Fold {fold}: Accuracy = {correct_predictions}/{len(actual)} ({(correct_predictions / len(actual)) * 100:.2f}%)")
+
+#     # Calculate and print total accuracy across all folds
+#     total_accuracy = total_correct / total_predictions * 100 if total_predictions > 0 else 0
+#     print(f"Total Accuracy across all folds: {total_accuracy:.2f}%")
 
 
-main()
+# main()
