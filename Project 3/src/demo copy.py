@@ -53,7 +53,7 @@ tuned_hyperparameters = {
 
 def main():
     #"Project 3\data\soybean-small.data"
-    classification = [ "Project 3\data\glass.data","Project 3\data\\breast-cancer-wisconsin.data"]
+    classification = ["Project 3\data\\breast-cancer-wisconsin.data"]
     regression = ["Project 3\data\\forestfires.data", "Project 3\data\machine.data", "Project 3\data\\abalone.data", ]
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
                                                                                                                                                                                                                                                 
