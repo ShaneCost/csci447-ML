@@ -17,7 +17,10 @@ class Edge:
         return self.end
     
     def print_edge(self):
-        print("Edge: start",self.start," end: ", self.end," weight: ", self.weight)
+        print("Start ", self.start.print_node() ," \nEnd ", self.end.print_node(), " \nWeight: ", self.weight)
+
+    def print_weight(self):
+        print("Weight: ", self.weight)
 
 
 class EdgeSet:

@@ -54,6 +54,24 @@ class NodeSet:
 
         self.soft_max_values = values
 
+    def print_and_run_soft_max(self):
+        values = {}
+        # Calculate the exponential of the output values
+        exp_values = np.exp([node.value for node in self.output_layer])
+
+        # Calculate the denominator (sum of exponential)
+        denominator = np.sum(exp_values)
+
+        # Calculate softmax values
+        for i, node in enumerate(self.output_layer):
+            output = exp_values[i] / denominator
+            print(f'\t{node.class_name}: {exp_values[i]} / {denominator} = {output}')
+            values[node.class_name] = output
+            node.value = output
+
+        self.soft_max_values = values
+
+
     def linear_activation(self):
         output = self.output_layer[0].value
         self.regression_output = output
