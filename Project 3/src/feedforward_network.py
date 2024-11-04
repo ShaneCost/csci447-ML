@@ -1,3 +1,5 @@
+__author__ = "<Hayden Perusich>"
+
 import random
 import numpy as np
 from node import *

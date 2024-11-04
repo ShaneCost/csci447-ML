@@ -7,7 +7,7 @@ class ConfusionMatrix:
         self.predicted_values = predicted
 
         # Create a mapping from string labels to numeric indices
-        self.classes = sorted(list(set(actual + predicted)))  # Unique sorted class labels
+        self.classes = sorted(list(set(actual)))  # Unique sorted class labels
         self.size = len(self.classes)
         self.label_to_index = {label: idx for idx, label in enumerate(self.classes)}
 
@@ -140,6 +140,9 @@ class ConfusionMatrix:
         return scores
 
     def generate_test_score(self):
+        """
+        Generate a score to use as the main performance metric
+        """
         f1 = 0
         num_class = 0
         for class_name in self.classes:

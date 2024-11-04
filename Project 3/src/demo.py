@@ -1,3 +1,5 @@
+__author__ = "<Hayden Perusich>"
+
 from feedforward_network import *
 from loss import *
 from root_data import *
@@ -42,11 +44,11 @@ tuned_hyperparameters_classification = {
         },
         1: {
             'num_nodes': 25,
-            'learning_rate': .01976302731
+            'learning_rate': 0.01976302731
         },
         2: {
             'num_nodes': 23,
-            'learning_rate': .0364031483
+            'learning_rate': 0.0364031483
         }
     }
 }
@@ -92,7 +94,7 @@ tuned_hyperparameters_regression= {
         },
         2: {
             'num_nodes': 4,
-            'learning_rate': .014201739
+            'learning_rate': 0.014201739
         }
     }
 }
@@ -134,7 +136,7 @@ def main():
             loss = Loss(prediction, actual, is_class=False).mean_squared_error()
             print(loss)
 
-main()
+# main()
 
 
 

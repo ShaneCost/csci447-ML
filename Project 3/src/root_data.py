@@ -55,7 +55,7 @@ class RootData:
 
         self.is_class = is_class
 
-        self.num_classes = 0
+        self.num_classes = 1
         self.classes = []
 
         # Folds + tuning set

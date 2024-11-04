@@ -1,9 +1,11 @@
+__author__ = "<Shane Costello>"
+
 import random
 import numpy as np
 from node import *
 from edge import *
 
-EPOCHS = 100
+EPOCHS = 500
 
 def derivative_function(value):
     return 1 - np.tanh(value) ** 2
@@ -189,13 +191,14 @@ class FeedForwardNetwork:
                 pass  # No updates needed for input nodes
 
     def train(self):
+        loss_values = []
         for epoch in range(EPOCHS):
             for cur, point in enumerate(self.training_data.feature_vectors):
                 prediction = self.forward(point)  # push a point forward through the graph
                 actual = self.training_data.target_vector[cur]  # get actual value
                 actual = float(actual) if not self.is_class else actual
                 loss_function_value = self.loss(actual)  # derive value of loss function
-
+                loss_values.append(loss_function_value)
                 # Back Propagation
                 self.calc_output_error(prediction, actual)  # calculate the error at the output layer
                 self.walk_back()  # update weights and biases
@@ -205,6 +208,7 @@ class FeedForwardNetwork:
 
             # Optionally log average loss per epoch here
             # print(f"Epoch {epoch}: Average Loss = {total_loss / len(self.training_data.feature_vectors):.4f}")
+        return loss_values
 
     def test(self):
         i = 0
@@ -257,4 +261,4 @@ def main():
     # print(f"Total Accuracy across all folds: {total_accuracy:.2f}%")
 
 
-main()
+# main()
