@@ -3,7 +3,7 @@ import numpy as np
 from node import *
 from edge import *
 
-EPOCHS = 1000
+EPOCHS = 100
 
 def derivative_function(value):
     return 1 - np.tanh(value) ** 2
@@ -150,20 +150,6 @@ class FeedForwardNetwork:
             delta = error * derivative_function(prediction)
             self.node_set.output_layer[0].gradient_value = delta
 
-    # TODO: Finish this function to walk back through the graph, updating weights and biases
-    # def walk_back(self):
-    #     for layer in reversed(self.node_set.hidden_layers): # walk through layers backward
-    #         for node in layer: # look at each node
-    #             outgoing_edges = self.edge_set.get_outgoing_edges(node) # get all edges leaving that node
-    #             for edge in outgoing_edges:
-    #                 output_node_delta = edge.end.gradient_value # get the delta value of all connected output nodes
-    #             # TODO: Find how to update weight + bias at each node, using the output nodes delta value calculated in calc_output_error()
-    #                 edge.weight = self.learning_rate * node.gradient_value * edge.start.value
-
-    #     # TODO: Handle input layers, consider case of 0 hidden layers
-    #     for layer in self.node_set.input_layer:
-    #         for node in layer:
-    #             pass
 
     def walk_back(self):
         # Handle output layer first
@@ -237,36 +223,38 @@ from root_data import *
 from meta_data import *
 
 
-# def main():
-#     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-#     # data = RootData("Project 3\data\soybean-small.data")
-#     data = RootData("Project 3\data\soybean-small.data", True)
-#     total_correct = 0
-#     total_predictions = 0
-#     avg = 0
-#     min_v = 100
-#     max_v = 0
+def main():
+    folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    # data = RootData("Project 3\data\soybean-small.data")
+    data = RootData("Project 3\data\machine.data", False)
+    total_correct = 0
+    total_predictions = 0
+    avg = 0
+    min_v = 100
+    max_v = 0
 
-#     for fold in folds:
-#         training = MetaData(data.get_training_set(fold))
-#         test = MetaData(data.get_test_set(fold))
+    for fold in folds:
+        training = MetaData(data.get_training_set(fold))
+        test = MetaData(data.get_test_set(fold))
 
-#         ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01)
-#         ffn.train()
+        ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, 1, data.classes, 0.01, is_class = False)
+        print("Graph created")
+        ffn.train()
 
-#         prediction, actual = ffn.test()
+        prediction, actual = ffn.test()
+        print(prediction, actual)
 
-#         correct_predictions = sum(1 for pred, act in zip(prediction, actual) if pred == act)
-#         total_correct += correct_predictions
-#         total_predictions += len(actual)
+    #     correct_predictions = sum(1 for pred, act in zip(prediction, actual) if pred == act)
+    #     total_correct += correct_predictions
+    #     total_predictions += len(actual)
 
-#         # Print results for each fold
-#         print(
-#             f"Fold {fold}: Accuracy = {correct_predictions}/{len(actual)} ({(correct_predictions / len(actual)) * 100:.2f}%)")
+    #     # Print results for each fold
+    #     print(
+    #         f"Fold {fold}: Accuracy = {correct_predictions}/{len(actual)} ({(correct_predictions / len(actual)) * 100:.2f}%)")
 
-#     # Calculate and print total accuracy across all folds
-#     total_accuracy = total_correct / total_predictions * 100 if total_predictions > 0 else 0
-#     print(f"Total Accuracy across all folds: {total_accuracy:.2f}%")
+    # # Calculate and print total accuracy across all folds
+    # total_accuracy = total_correct / total_predictions * 100 if total_predictions > 0 else 0
+    # print(f"Total Accuracy across all folds: {total_accuracy:.2f}%")
 
 
-# main()
+main()

@@ -1,12 +1,12 @@
-from feedforward_shane import *
-from confusion_matrix import *
+from feedforward_network import *
+from loss import *
 from root_data import *
 from meta_data import *
 import os
 ## HYPERPARAMETERS
 # soybean: HIDDEN_LAYERS 0-2, NODES _, LEARNING_RATE_, BATCH_SIZE_,   
 
-tuned_hyperparameters = {
+tuned_hyperparameters_classification = {
     'breast-cancer-wisconsin' : {
         0: {
             'num_nodes': 68,
@@ -51,14 +51,61 @@ tuned_hyperparameters = {
     }
 }
 
+
+tuned_hyperparameters_regression= {
+    'forestfires' : {
+        0: {
+            'num_nodes': 26,
+            'learning_rate': 0.065306469
+        },
+        1: {
+            'num_nodes': 11,
+            'learning_rate': 0.041283924
+        },
+        2: {
+            'num_nodes': 10,
+            'learning_rate': 0.0125829273
+        },
+    },
+    'machine': {
+        0:{
+            'num_nodes': 34,
+            'learning_rate': 0.00273920
+        },
+        1: {
+            'num_nodes': 9,
+            'learning_rate': 0.04940382
+        },
+        2: {
+            'num_nodes': 7,
+            'learning_rate': 0.01382018
+        },
+    },
+    'abalone': {
+        0: {
+            'num_nodes': 11,
+            'learning_rate': 0.0244905
+        },
+        1: {
+            'num_nodes': 5,
+            'learning_rate': 0.02940204
+        },
+        2: {
+            'num_nodes': 4,
+            'learning_rate': .014201739
+        }
+    }
+}
+
+
 def main():
     #"Project 3\data\soybean-small.data"
-    classification = [ "Project 3\data\glass.data","Project 3\data\\breast-cancer-wisconsin.data"]
+    # classification = [ "Project 3\data\glass.data","Project 3\data\\breast-cancer-wisconsin.data"]
     regression = ["Project 3\data\\forestfires.data", "Project 3\data\machine.data", "Project 3\data\\abalone.data", ]
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-                                                                                                                                                                                                                                                
-    for file in classification: 
-        data = RootData(file, True)
+
+    for file in regression: 
+        data = RootData(file, False)
         filename = os.path.splitext(os.path.basename(file))[0]
         for num_hiddent_layers in range(3):
             all_predictions = []
@@ -70,10 +117,13 @@ def main():
                 training = MetaData(data.get_training_set(fold))
                 test = MetaData(data.get_test_set(fold))
 
-                hidden_size = tuned_hyperparameters[filename][num_hiddent_layers]["num_nodes"]
-                learning_rate = tuned_hyperparameters[filename][num_hiddent_layers]["learning_rate"]
+                hidden_size = tuned_hyperparameters_regression[filename][num_hiddent_layers]["num_nodes"]
+                learning_rate = tuned_hyperparameters_regression[filename][num_hiddent_layers]["learning_rate"]
                 
-                ffn = FeedForwardNetwork(training, test, num_hiddent_layers, hidden_size, data.num_features, data.num_classes, data.classes, learning_rate)
+                ffn = FeedForwardNetwork(training, test, num_hiddent_layers, hidden_size=hidden_size,
+                                 input_size=data.num_features, output_size=1,
+                                 learning_rate=learning_rate, is_class=False)
+
                 ffn.train()
                 prediction, actual  = ffn.test()
                 all_predictions.extend(prediction)
@@ -81,21 +131,9 @@ def main():
                 print("Done with fold", fold, " : ", filename)
 
             print("hidden layers: ",num_hiddent_layers, filename)
-            ConfusionMatrix(all_actual, all_predictions).print_confusion_matrix()
+            loss = Loss(prediction, actual, is_class=False).mean_squared_error()
+            print(loss)
 
-
-
-    ## print CM for each data_set
-    # for file in regression:
-    #     data = RootData(file, False)
-    #     for fold in folds:
-    #         training = MetaData(data.get_training_set(fold))
-    #         test = MetaData(data.get_test_set(fold))
-    #         ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, 1, data.classes, 0.01)
-    #         ffn.train()
-    #         ffn.test()
-    # print mean squared error for each dataset
-    
 main()
 
 
