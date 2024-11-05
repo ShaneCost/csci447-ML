@@ -230,7 +230,7 @@ from meta_data import *
 def main():
     folds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     # data = RootData("Project 3\data\soybean-small.data")
-    data = RootData("Project 3\data\machine.data", False)
+    data = RootData("Project 3\data\soybean-small.data", True)
     total_correct = 0
     total_predictions = 0
     avg = 0
@@ -241,7 +241,7 @@ def main():
         training = MetaData(data.get_training_set(fold))
         test = MetaData(data.get_test_set(fold))
 
-        ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, 1, data.classes, 0.01, is_class = False)
+        ffn = FeedForwardNetwork(training, test, 1, 5, data.num_features, data.num_classes, data.classes, 0.01, is_class = True)
         print("Graph created")
         ffn.train()
 
@@ -261,4 +261,4 @@ def main():
     # print(f"Total Accuracy across all folds: {total_accuracy:.2f}%")
 
 
-# main()
+main()

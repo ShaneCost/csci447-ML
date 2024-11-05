@@ -1,44 +1,66 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-import os
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 
-# Define confusion matrices
-confusion_matrices = {
-    '0_hidden_layers': np.array([[5, 4, 11, 7, 16, 17],
-                                  [10, 8, 11, 10, 16, 15],
-                                  [1, 5, 2, 1, 3, 4],
-                                  [1, 1, 3, 1, 2, 2],
-                                  [1, 4, 1, 0, 2, 1],
-                                  [6, 6, 7, 5, 2, 2]]),
-    
-    '1_hidden_layer': np.array([[49, 11, 0, 0, 0, 0],
-                                 [7, 56, 0, 5, 2, 0],
-                                 [0, 15, 1, 0, 0, 0],
-                                 [0, 4, 0, 4, 0, 2],
-                                 [0, 1, 0, 0, 3, 5],
-                                 [0, 2, 0, 1, 0, 25]]),
-    
-    '2_hidden_layers': np.array([[36, 24, 0, 0, 0, 0],
-                                  [30, 38, 0, 1, 0, 1],
-                                  [5, 11, 0, 0, 0, 0],
-                                  [2, 2, 1, 1, 0, 4],
-                                  [0, 1, 0, 1, 1, 6],
-                                  [0, 1, 0, 6, 0, 21]])
-}
+# Create a custom color map that goes from white to red
+cmap = LinearSegmentedColormap.from_list("white_to_red", ["white", "red"])
 
-# Create heatmaps and save them as PDF files
-for title, matrix in confusion_matrices.items():
-    plt.figure(figsize=(6, 6))  # Set figure size
-    sns.heatmap(matrix, annot=True, fmt='d', cmap='Reds', cbar=False,
-                 xticklabels=['D1', 'D2', 'D3', 'D4'], yticklabels=['D1', 'D2', 'D3', 'D4'])
-    plt.title(f'Confusion Matrix: {title.replace("_", " ")}')
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
+# Confusion Matrices for each hidden layer configuration
 
-    # Save the heatmap as a PDF
+# Hidden layer 0
+cm0 = np.array([
+    [2, 1, 6, 1],
+    [3, 1, 1, 5],
+    [3, 4, 0, 3],
+    [3, 7, 2, 1]
+])
 
-    plt.savefig(f'glass,{title}.pdf', format='pdf')
-    plt.close()  # Close the figure to free up memory
+# Hidden layer 1
+cm1 = np.array([
+    [10, 0, 0, 0],
+    [0, 10, 0, 0],
+    [0, 0, 10, 0],
+    [0, 0, 1, 12]
+])
 
-print("Heatmaps saved as PDF files.")
+# Hidden layer 2
+cm2 = np.array([
+    [7, 2, 1, 0],
+    [1, 8, 0, 1],
+    [1, 0, 8, 1],
+    [0, 0, 3, 10]
+])
+
+# Create and save heatmap for the hidden layer 0 confusion matrix
+plt.figure(figsize=(6, 6))
+sns.heatmap(cm0, annot=True, fmt="d", cmap=cmap, cbar=True, 
+            xticklabels=["D1", "D2", "D3", "D4"], yticklabels=["D1", "D2", "D3", "D4"], cbar_kws={'label': 'Counts'})
+plt.title('Soybean-small: hidden layers 0', fontsize=14)
+plt.xlabel('Predicted', fontsize=12)
+plt.ylabel('Actual', fontsize=12)
+plt.tight_layout()
+plt.savefig('Soybean-small_0.pdf')  # Save as a PDF
+plt.close()  # Close the figure to avoid overlapping with the next one
+
+# Create and save heatmap for the hidden layer 1 confusion matrix
+plt.figure(figsize=(6, 6))
+sns.heatmap(cm1, annot=True, fmt="d", cmap=cmap, cbar=True, 
+            xticklabels=["D1", "D2", "D3", "D4"], yticklabels=["D1", "D2", "D3", "D4"], cbar_kws={'label': 'Counts'})
+plt.title('Soybean-small: hidden layers 1', fontsize=14)
+plt.xlabel('Predicted', fontsize=12)
+plt.ylabel('Actual', fontsize=12)
+plt.tight_layout()
+plt.savefig('Soybean-small_1.pdf')  # Save as a PDF
+plt.close()
+
+# Create and save heatmap for the hidden layer 2 confusion matrix
+plt.figure(figsize=(6, 6))
+sns.heatmap(cm2, annot=True, fmt="d", cmap=cmap, cbar=True, 
+            xticklabels=["D1", "D2", "D3", "D4"], yticklabels=["D1", "D2", "D3", "D4"], cbar_kws={'label': 'Counts'})
+plt.title("Soybean-small: hidden layers 0", fontsize=14)
+plt.xlabel('Predicted', fontsize=12)
+plt.ylabel('Actual', fontsize=12)
+plt.tight_layout()
+plt.savefig('Soybean-small_2.pdf')  # Save as a PDF
+plt.close()
