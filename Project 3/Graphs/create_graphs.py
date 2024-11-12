@@ -1,44 +1,72 @@
-import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-import os
+import seaborn as sns
+import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 
-# Define confusion matrices
-confusion_matrices = {
-    '0_hidden_layers': np.array([[5, 4, 11, 7, 16, 17],
-                                  [10, 8, 11, 10, 16, 15],
-                                  [1, 5, 2, 1, 3, 4],
-                                  [1, 1, 3, 1, 2, 2],
-                                  [1, 4, 1, 0, 2, 1],
-                                  [6, 6, 7, 5, 2, 2]]),
-    
-    '1_hidden_layer': np.array([[49, 11, 0, 0, 0, 0],
-                                 [7, 56, 0, 5, 2, 0],
-                                 [0, 15, 1, 0, 0, 0],
-                                 [0, 4, 0, 4, 0, 2],
-                                 [0, 1, 0, 0, 3, 5],
-                                 [0, 2, 0, 1, 0, 25]]),
-    
-    '2_hidden_layers': np.array([[36, 24, 0, 0, 0, 0],
-                                  [30, 38, 0, 1, 0, 1],
-                                  [5, 11, 0, 0, 0, 0],
-                                  [2, 2, 1, 1, 0, 4],
-                                  [0, 1, 0, 1, 1, 6],
-                                  [0, 1, 0, 6, 0, 21]])
-}
+# Create a custom color map that goes from white to red
+cmap = LinearSegmentedColormap.from_list("white_to_red", ["white", "red"])
 
-# Create heatmaps and save them as PDF files
-for title, matrix in confusion_matrices.items():
-    plt.figure(figsize=(6, 6))  # Set figure size
-    sns.heatmap(matrix, annot=True, fmt='d', cmap='Reds', cbar=False,
-                 xticklabels=['D1', 'D2', 'D3', 'D4'], yticklabels=['D1', 'D2', 'D3', 'D4'])
-    plt.title(f'Confusion Matrix: {title.replace("_", " ")}')
-    plt.xlabel('Predicted')
-    plt.ylabel('Actual')
+# Confusion Matrices from the provided data
 
-    # Save the heatmap as a PDF
+# First confusion matrix
+cm1 = np.array([
+    [11, 9, 8, 7, 18, 7],
+    [17, 8, 13, 14, 11, 7],
+    [5, 5, 2, 2, 1, 1],
+    [3, 2, 0, 3, 1, 3],
+    [5, 0, 1, 1, 0, 2],
+    [8, 3, 3, 4, 5, 3]
+])
 
-    plt.savefig(f'glass,{title}.pdf', format='pdf')
-    plt.close()  # Close the figure to free up memory
+# Second confusion matrix
+cm2 = np.array([
+    [47, 7, 0, 2, 7, 0],
+    [20, 21, 13, 6, 4, 6],
+    [1, 7, 3, 2, 2, 1],
+    [0, 2, 1, 1, 2, 4],
+    [0, 0, 1, 1, 1, 5],
+    [0, 1, 0, 0, 0, 25]
+])
 
-print("Heatmaps saved as PDF files.")
+# Third confusion matrix
+cm3 = np.array([
+    [11, 34, 6, 6, 6, 0],
+    [7, 41, 7, 7, 7, 1],
+    [1, 10, 2, 1, 2, 0],
+    [1, 4, 1, 1, 0, 3],
+    [0, 5, 1, 0, 1, 1],
+    [1, 12, 1, 0, 1, 11]
+])
+
+# Create and save heatmap for the first confusion matrix
+plt.figure(figsize=(6, 6))
+sns.heatmap(cm1, annot=True, fmt="d", cmap=cmap, cbar=True, 
+            xticklabels=[1, 2, 3, 5, 6, 7], yticklabels=[1, 2, 3, 5, 6, 7], cbar_kws={'label': 'Counts'})
+plt.title('glass_hidden_layers_0', fontsize=14)  # Update title
+plt.xlabel('Predicted', fontsize=12)
+plt.ylabel('Actual', fontsize=12)
+plt.tight_layout()
+plt.savefig('glass_hidden_layers_0.png')  # Save the first heatmap as a PNG with an updated file name
+plt.close()  # Close the figure to avoid overlapping with the next one
+
+# Create and save heatmap for the second confusion matrix
+plt.figure(figsize=(6, 6))
+sns.heatmap(cm2, annot=True, fmt="d", cmap=cmap, cbar=True, 
+            xticklabels=[1, 2, 3, 5, 6, 7], yticklabels=[1, 2, 3, 5, 6, 7], cbar_kws={'label': 'Counts'})
+plt.title('glass_hidden_layers_1', fontsize=14)  # Update title
+plt.xlabel('Predicted', fontsize=12)
+plt.ylabel('Actual', fontsize=12)
+plt.tight_layout()
+plt.savefig('glass_hidden_layers_1.png')  # Save the second heatmap as a PNG with an updated file name
+plt.close()
+
+# Create and save heatmap for the third confusion matrix
+plt.figure(figsize=(6, 6))
+sns.heatmap(cm3, annot=True, fmt="d", cmap=cmap, cbar=True, 
+            xticklabels=[1, 2, 3, 5, 6, 7], yticklabels=[1, 2, 3, 5, 6, 7], cbar_kws={'label': 'Counts'})
+plt.title('glass_hidden_layers_2', fontsize=14)  # Update title
+plt.xlabel('Predicted', fontsize=12)
+plt.ylabel('Actual', fontsize=12)
+plt.tight_layout()
+plt.savefig('glass_hidden_layers_2.png')  # Save the third heatmap as a PNG with an updated file name
+plt.close()
