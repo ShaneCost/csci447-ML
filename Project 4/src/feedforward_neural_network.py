@@ -1,36 +1,44 @@
-__author__ = "<Shane Costello>"
+__author__ = "<Hayden Perusich>", "<Shane Costello>"
 
 import random
 import numpy as np
-from node import *
-from edge import *
+from node import NodeSet, Node
+from edge import EdgeSet, Edge
+from meta_data import *
 
-EPOCHS = 500
+EPOCHS = 100
+BATCH_SIZE = 32
 
-def derivative_function(value):
-    return 1 - np.tanh(value) ** 2
+def tanh(x):
+    return np.tanh(x)
+
+def tanh_derivative(x):
+    return 1 - np.tanh(x) ** 2
+
+def softmax(x):
+    exp_values = np.exp(x - np.max(x))  # Stability improvement for softmax
+    return exp_values / exp_values.sum()
+
+def softmax_derivative(output):
+    return output * (1 - output)
 
 class FeedForwardNetwork:
-    def __init__(self, training_data, testing_data, num_hidden_layers, hidden_size, input_size, output_size, classes,
-                 learning_rate,
-                 is_class=True):
-        self.training_data = training_data
-        self.testing_data = testing_data
-        self.num_hidden_layers = num_hidden_layers
-        self.hidden_size = hidden_size
-        self.is_class = is_class
-        self.input_size = input_size
-        if is_class:
-            self.output_size = output_size
-        else:
-            self.output_size = 1
-        self.classes = classes
-        self.learning_rate = learning_rate
+
+    def __init__(self, data, hold_out_fold, number_hidden_layers, hyperparameters, _id):
+        self.id = _id
+        self.is_class = data.is_class
+        self.training_data = MetaData(data.get_training_set(hold_out_fold))
+        self.testing_data = MetaData(data.get_testing_set(hold_out_fold))
+        self.num_hidden_layers = number_hidden_layers
+        self.hidden_size = hyperparameters['num_hidden_nodes']
+        self.input_size = data.num_features
+        self.output_size = data.num_classes if self.is_class else 1
+        self.classes = data.classes
+        self.learning_rate = hyperparameters['learning_rate']
+        self.fitness = 0
 
         self.node_set = NodeSet()
         self.edge_set = EdgeSet()
-
-        self.initialize_graph()
 
     def initialize_graph(self):
         node_set = NodeSet()
@@ -91,135 +99,107 @@ class FeedForwardNetwork:
         self.node_set = node_set
         self.edge_set = edge_set
 
-    # function for forward propagation
     def forward(self, point):
-        # Step 1: Set input layer values
-        for index, feature in enumerate(point):  # Assuming the last element is the label
+        # Set input layer values
+        for index, feature in enumerate(point):
             self.node_set.input_layer[index].update_value(feature)
 
-        # Step 2: Iterate over hidden layers
-        for layer in self.node_set.hidden_layers:
-            for current_node in layer:
-                # Calculate the weighted sum of inputs from the previous layer
-                input_sum = 0
-                incoming_edges = self.edge_set.get_incoming_edges(current_node)
-                for edge in incoming_edges:
-                    inp_value = (edge.weight * edge.start.value)
-                    input_sum += inp_value
-                input_sum += current_node.bias
-                current_node.value = input_sum
-                current_node.activation()
+        # Forward pass through hidden layers
+        self.forward_hidden_layers()
 
-        # Step 3: Forward to output layer
+        # Forward pass to output layer
+        return self.forward_output_layer()
+
+    def forward_hidden_layers(self):
+        for layer in self.node_set.hidden_layers:
+            for node in layer:
+                input_sum = sum(
+                    edge.weight * edge.start.value for edge in self.edge_set.get_incoming_edges(node)) + node.bias
+                node.value = input_sum
+                node.value = tanh(node.value)
+
+    def forward_output_layer(self):
         for out_node in self.node_set.output_layer:
-            input_sum = 0
-            incoming_edges = self.edge_set.get_incoming_edges(out_node)
-            for edge in incoming_edges:
-                inp_value = (edge.weight * edge.start.value)
-                input_sum += inp_value
-            input_sum += out_node.bias
+            input_sum = sum(
+                edge.weight * edge.start.value for edge in self.edge_set.get_incoming_edges(out_node)) + out_node.bias
             out_node.value = input_sum
 
         if self.is_class:
-            self.node_set.soft_max()
-            prediction = max(self.node_set.soft_max_values, key=self.node_set.soft_max_values.get)
+            # Apply softmax for classification
+            output_values = np.array([node.value for node in self.node_set.output_layer])
+            softmax_values = softmax(output_values)
+            return softmax_values
         else:
-            self.node_set.linear_activation()
-            prediction = self.node_set.regression_output
+            return self.node_set.output_layer[0].value
 
-        return prediction
-
-    def loss(self, actual):
-        # Cross-Entropy Loss
+    def loss(self, actual, prediction):
         if self.is_class:
-            # Ensure probabilities are between 0 and 1
-            predicted_probs = {k: np.clip(v, 1e-15, 1 - 1e-15) for k, v in self.node_set.soft_max_values.items()}
-            # Cross-entropy formula for multiclass classification
-            return -np.log(predicted_probs[actual])
-        # Mean Squared Error
+            # Find the index of the actual class
+            actual_index = self.classes.index(actual)
+            # Use the predicted probability for the actual class
+            return -np.log(prediction[actual_index])
         else:
-            return ((actual - self.node_set.regression_output) ** 2) / 2
+            # Mean squared error for regression
+            return 0.5 * (actual - prediction) ** 2
 
     def calc_output_error(self, prediction, actual):
         if self.is_class:
-            for node in self.node_set.output_layer:
+            # For classification, calculate error using softmax derivative
+            for i, node in enumerate(self.node_set.output_layer):
                 target = 1 if node.class_name == actual else 0
-                error = ((target - node.value) ** 2) / 2
-                delta = error * derivative_function(node.value)
-                node.gradient_value = delta
+                error = target - prediction[i]
+                node.gradient_value = error * softmax_derivative(prediction[i])
         else:
-            error = ((actual - prediction) ** 2) / 2
-            delta = error * derivative_function(prediction)
-            self.node_set.output_layer[0].gradient_value = delta
-
+            error = actual - prediction
+            self.node_set.output_layer[0].gradient_value = error * tanh_derivative(prediction)
 
     def walk_back(self):
-        # Handle output layer first
+        # Update output layer weights and biases
         for node in self.node_set.output_layer:
-            outgoing_edges = self.edge_set.get_outgoing_edges(node)
-            for edge in outgoing_edges:
-                # Update the weight
+            for edge in self.edge_set.get_outgoing_edges(node):
                 edge.weight += self.learning_rate * node.gradient_value * edge.start.value
-
-                # Update the bias
                 node.bias += self.learning_rate * node.gradient_value
 
-        # Handle hidden layers
+        # Update hidden layers
         for layer in reversed(self.node_set.hidden_layers):
             for node in layer:
-                outgoing_edges = self.edge_set.get_outgoing_edges(node)
-                total_delta = 0
-                for edge in outgoing_edges:
-                    # Make sure edge.end refers to the correct node (the one receiving the gradient)
-                    total_delta += edge.end.gradient_value * edge.weight
-
-                # Calculate gradient for current node
-                node.gradient_value = total_delta * derivative_function(node.value)
-
-                # Update weights and bias for incoming edges
-                incoming_edges = self.edge_set.get_incoming_edges(node)
-                for edge in incoming_edges:
+                total_delta = sum(
+                    edge.end.gradient_value * edge.weight for edge in self.edge_set.get_outgoing_edges(node))
+                node.gradient_value = total_delta * tanh_derivative(node.value)
+                for edge in self.edge_set.get_incoming_edges(node):
                     edge.weight += self.learning_rate * node.gradient_value * edge.start.value
-
-                # Update the bias for the current node
                 node.bias += self.learning_rate * node.gradient_value
-
-        # Handle input layer only if no hidden layers
-        if self.num_hidden_layers == 0:
-            for node in self.node_set.input_layer:
-                # Typically, input nodes do not have weights to update
-                pass  # No updates needed for input nodes
 
     def train(self):
         loss_values = []
         for epoch in range(EPOCHS):
-            for cur, point in enumerate(self.training_data.feature_vectors):
-                prediction = self.forward(point)  # push a point forward through the graph
-                actual = self.training_data.target_vector[cur]  # get actual value
-                actual = float(actual) if not self.is_class else actual
-                loss_function_value = self.loss(actual)  # derive value of loss function
-                loss_values.append(loss_function_value)
-                # Back Propagation
-                self.calc_output_error(prediction, actual)  # calculate the error at the output layer
-                self.walk_back()  # update weights and biases
+            batch_loss = []
+            for batch in range(0, len(self.training_data.feature_vectors), BATCH_SIZE):
+                batch_data = self.training_data.feature_vectors[batch: batch + BATCH_SIZE]
+                batch_targets = self.training_data.target_vector[batch: batch + BATCH_SIZE]
 
-                # If you want to track loss, you could accumulate it here
-                # total_loss += loss_function_value
+                # Mini-batch training
+                for point, target in zip(batch_data, batch_targets):
+                    prediction = self.forward(point)
+                    actual = float(target) if not self.is_class else target
+                    batch_loss.append(self.loss(actual, prediction))
+                    self.calc_output_error(prediction, actual)
+                    self.walk_back()
 
-            # Optionally log average loss per epoch here
-            # print(f"Epoch {epoch}: Average Loss = {total_loss / len(self.training_data.feature_vectors):.4f}")
+            # Calculate average loss for the epoch
+            loss_values.append(np.mean(batch_loss))
+            # print(f"Epoch {epoch + 1}/{EPOCHS}: Loss = {loss_values[-1]:.4f}")
+
         return loss_values
 
     def test(self):
-        i = 0
-        prediction = []
-        actual = []
+        predictions, actual = [], []
         for point in self.testing_data.feature_vectors:
-            predict = self.forward(point)
-            act = self.testing_data.target_vector[i]
-            prediction.append(predict)
-            actual.append(act)
-            i += 1
-        return prediction, actual
-
-
+            prediction = self.forward(point)
+            # Get the index of the class with the highest probability
+            predicted_class_index = np.argmax(prediction)  # Returns the index of the highest value
+            predicted_class = self.classes[predicted_class_index]  # Get the class label corresponding to that index
+            actual = self.testing_data.target_vector[len(predictions)]  # Actual class label
+            predictions.append(predicted_class)  # Append the predicted class label
+            actual.append(actual)  # Append the actual class label
+        return predictions, actual
