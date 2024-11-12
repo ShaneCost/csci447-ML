@@ -70,6 +70,7 @@ def requirement_1(data_sets, holdout_fold, graph_sizes):
                 print(loss.results)
 
 
+
 def requirement_2(data_sets, holdout_fold, graph_sizes):
     """
     Show a sample model for the smallest of each of your neural network types. This will consist of showing
@@ -338,35 +339,35 @@ def main():
     regression network. Show results for each of the cases where you have no hidden layers, one hidden
     layer, and two hidden layers.
     """
-    # requirement_1(data_sets, holdout_fold, graph_sizes)
+    requirement_1(data_sets, holdout_fold, graph_sizes)
 
     input('\nContinue\n')
     """
     Show a sample model for the smallest of each of your neural network types. This will consist of showing
     the weight matrices with the inputs/outputs of the layer labeled in some way.
     """
-    # requirement_2(data_sets, holdout_fold, graph_sizes)
+    requirement_2(data_sets, holdout_fold, graph_sizes)
 
     input('\nContinue\n')
     """
     Demonstrate and explain how an example is propagated through a two hidden layer network of your
     choice. Be sure to show the activations at each layer being calculated correctly.
     """
-    # requirement_3(data_sets, holdout_fold, graph_sizes)
+    requirement_3(data_sets, holdout_fold, graph_sizes)
 
     input('\nContinue\n')
     """
     Demonstrate the gradient calculation at the output for one classification network and one regression
     network.
     """
-    # requirement_4(data_sets, holdout_fold, graph_sizes)
+    requirement_4(data_sets, holdout_fold, graph_sizes)
 
     input('\nContinue\n')
     """
     Demonstrate the weight updates occurring on a two-layer network for each of the layers
     for one classification network and one regression network.
     """
-    # requirement_5(data_sets, holdout_fold, graph_sizes)
+    requirement_5(data_sets, holdout_fold, graph_sizes)
 
     input('\nContinue\n')
     """
