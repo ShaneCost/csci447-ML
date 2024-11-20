@@ -28,7 +28,7 @@ class FeedForwardNetwork:
         self.id = _id
         self.is_class = data.is_class
         self.training_data = MetaData(data.get_training_set(hold_out_fold))
-        self.testing_data = MetaData(data.get_testing_set(hold_out_fold))
+        self.testing_data = MetaData(data.get_test_set(hold_out_fold))
         self.num_hidden_layers = number_hidden_layers
         self.hidden_size = hyperparameters['num_hidden_nodes']
         self.input_size = data.num_features
@@ -39,6 +39,8 @@ class FeedForwardNetwork:
 
         self.node_set = NodeSet()
         self.edge_set = EdgeSet()
+
+        self.initialize_graph()
 
     def initialize_graph(self):
         node_set = NodeSet()
@@ -172,7 +174,7 @@ class FeedForwardNetwork:
 
     def train(self):
         loss_values = []
-        for epoch in range(EPOCHS):
+        for _ in range(EPOCHS):
             batch_loss = []
             for batch in range(0, len(self.training_data.feature_vectors), BATCH_SIZE):
                 batch_data = self.training_data.feature_vectors[batch: batch + BATCH_SIZE]
@@ -203,3 +205,107 @@ class FeedForwardNetwork:
             predictions.append(predicted_class)  # Append the predicted class label
             actual.append(actual)  # Append the actual class label
         return predictions, actual
+    
+
+    # unrolls the value from each node to create a int[]
+    def unroll_nodes(self):
+        nodes_list = []
+        nodes = self.node_set
+
+        # I input '*' into the nodes list to dictate where different layers are distinguished  
+        for input_nodes in nodes.input_layer:
+            nodes_list.append(input_nodes.bias)
+        nodes_list.append('*') 
+
+        for hidden_layers in nodes.hidden_layers:
+            for hidden_node in hidden_layers:
+                nodes_list.append(hidden_node.bias)
+            nodes_list.append('*')
+
+        for output_nodes in nodes.output_layer:
+            nodes_list.append(output_nodes.bias)
+
+        return nodes_list
+        
+    def unroll_edges(self):
+
+        edge_list = []
+        nodes = self.node_set
+        edges = self.edge_set
+
+        # I input '*' into the nodes list to dictate where different layers are distinguished  
+        for input_nodes in nodes.input_layer:
+                edge_list.append([edge.weight for edge in edges.get_outgoing_edges(input_nodes)])
+        edge_list.append('*') 
+
+        for hidden_layers in nodes.hidden_layers:
+            for hidden_node in hidden_layers:
+                edge_list.append([edge.weight for edge in edges.get_outgoing_edges(hidden_node)])
+            edge_list.append('*')
+
+
+        return edge_list
+
+    def roll_up(self, node_list):
+        node_set = NodeSet()
+        edge_set = EdgeSet()
+
+        # Input nodes
+        input_layer = []
+        while node_list and node_list[0] != '*':
+            input_layer.append(Node(node_list.pop(0)))  
+        if input_layer:
+            node_set.input_layer = input_layer  
+
+        # Output nodes
+        output_layer = []
+        while node_list and node_list[-1] != '*':
+            output_layer.insert(0, Node(node_list.pop()))  
+        if output_layer:
+            node_set.output_layer = output_layer  
+
+        # Hidden layers
+        hidden_layers = []
+        while node_list:
+            hidden_layer = []
+            while node_list and node_list[0] != '*':
+                hidden_layer.append(Node(node_list.pop(0)))  
+            if hidden_layer:
+                hidden_layers.append(hidden_layer)  
+            if node_list:
+                node_list.pop(0)  
+        node_set.hidden_layers = hidden_layers
+
+        self.node_set = node_set
+
+
+
+from root_data import *
+
+def main():
+    data = RootData('Project 4\data\soybean-small.data', True)
+
+    
+
+    ffn = FeedForwardNetwork(data=data, hold_out_fold=1, 
+                            number_hidden_layers=2, hyperparameters={'num_hidden_nodes': 5, 'learning_rate' : 0.01},
+                            _id=1)
+
+
+#     class FeedForwardNetwork(
+#     data: Any,
+#     hold_out_fold: Any,
+#     number_hidden_layers: Any,
+#     hyperparameters: Any,
+#     _id: Any
+# )
+
+    nodes = ffn.unroll_nodes()
+    print(nodes)
+    print(ffn.roll_up(nodes))
+    print(ffn.unroll_nodes())
+
+
+
+
+main()
