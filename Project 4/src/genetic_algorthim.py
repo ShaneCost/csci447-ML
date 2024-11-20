@@ -132,3 +132,5 @@ class GeneticAlgorithm:
         most_fit = sorted_population[0]
         prediction, actual = most_fit.test()
 
+        return prediction, actual
+
