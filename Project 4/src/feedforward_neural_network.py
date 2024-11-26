@@ -207,26 +207,27 @@ class FeedForwardNetwork:
         return predictions, actual
     
 
-    # unrolls the value from each node to create a int[]
+    # unrolls the node object from the fnn and returns one array
     def unroll_nodes(self):
         nodes_list = []
         nodes = self.node_set
 
         # I input '*' into the nodes list to dictate where different layers are distinguished  
         for input_nodes in nodes.input_layer:
-            nodes_list.append(input_nodes.bias)
+            nodes_list.append(input_nodes)
         nodes_list.append('*') 
 
         for hidden_layers in nodes.hidden_layers:
             for hidden_node in hidden_layers:
-                nodes_list.append(hidden_node.bias)
+                nodes_list.append(hidden_node)
             nodes_list.append('*')
 
         for output_nodes in nodes.output_layer:
-            nodes_list.append(output_nodes.bias)
+            nodes_list.append(output_nodes)
 
         return nodes_list
-        
+    
+    # returns one array containing all the edge objects
     def unroll_edges(self):
 
         edge_list = []
@@ -235,32 +236,31 @@ class FeedForwardNetwork:
 
         # I input '*' into the nodes list to dictate where different layers are distinguished  
         for input_nodes in nodes.input_layer:
-                edge_list.append([edge.weight for edge in edges.get_outgoing_edges(input_nodes)])
-        edge_list.append('*') 
+                edge_list.extend(edges.get_outgoing_edges(input_nodes))
 
         for hidden_layers in nodes.hidden_layers:
             for hidden_node in hidden_layers:
-                edge_list.append([edge.weight for edge in edges.get_outgoing_edges(hidden_node)])
-            edge_list.append('*')
-
+                edge_list.extend(edges.get_outgoing_edges(hidden_node))        
 
         return edge_list
 
-    def roll_up(self, node_list):
+    def roll_up(self, node_list, edge_list):
         node_set = NodeSet()
         edge_set = EdgeSet()
 
         # Input nodes
         input_layer = []
         while node_list and node_list[0] != '*':
-            input_layer.append(Node(node_list.pop(0)))  
+            input_layer.append (node_list.pop(0))
+            self.node_set.input_layer
+
         if input_layer:
             node_set.input_layer = input_layer  
 
         # Output nodes
         output_layer = []
         while node_list and node_list[-1] != '*':
-            output_layer.insert(0, Node(node_list.pop()))  
+            output_layer.insert(0, node_list.pop())
         if output_layer:
             node_set.output_layer = output_layer  
 
@@ -269,15 +269,19 @@ class FeedForwardNetwork:
         while node_list:
             hidden_layer = []
             while node_list and node_list[0] != '*':
-                hidden_layer.append(Node(node_list.pop(0)))  
+                hidden_layer.append(node_list.pop(0))
             if hidden_layer:
                 hidden_layers.append(hidden_layer)  
             if node_list:
-                node_list.pop(0)  
+                node_list.pop(0)  # Remove the '*' separator between layers
         node_set.hidden_layers = hidden_layers
 
         self.node_set = node_set
 
+        new_edges = EdgeSet()
+        new_edges.import_edges(edge_list)
+
+        self.edge_set = new_edges
 
 
 from root_data import *
@@ -290,22 +294,6 @@ def main():
     ffn = FeedForwardNetwork(data=data, hold_out_fold=1, 
                             number_hidden_layers=2, hyperparameters={'num_hidden_nodes': 5, 'learning_rate' : 0.01},
                             _id=1)
-
-
-#     class FeedForwardNetwork(
-#     data: Any,
-#     hold_out_fold: Any,
-#     number_hidden_layers: Any,
-#     hyperparameters: Any,
-#     _id: Any
-# )
-
-    nodes = ffn.unroll_nodes()
-    print(nodes)
-    print(ffn.roll_up(nodes))
-    print(ffn.unroll_nodes())
-
-
 
 
 main()

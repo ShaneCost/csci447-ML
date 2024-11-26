@@ -72,6 +72,15 @@ class EdgeSet:
         :param edge: Instance of the Edge class
         """
         self.edges.append(edge)
+    
+    def import_edges(self, edge_array):
+        """
+        Method used to convert a array into a list of edges
+
+        :param edges: array of Edge Objects
+        """
+        self.edges = edge_array
+
 
     def get_incoming_edges(self, node):
         """
