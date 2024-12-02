@@ -225,4 +225,4 @@ def main():
     regression_ga.train()
     prediction, actual = regression_ga.test()
 
-main()
+# main()
