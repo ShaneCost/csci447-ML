@@ -203,9 +203,22 @@ class FeedForwardNetwork:
             predicted_class = self.classes[predicted_class_index]  # Get the class label corresponding to that index
             actual = self.testing_data.target_vector[len(predictions)]  # Actual class label
             predictions.append(predicted_class)  # Append the predicted class label
-            actuals.append(actual)  # Append the actual class label
-        return predictions, actuals
-    
+            actual.append(actual)  # Append the actual class label
+        return predictions, actual
+
+    def forward_pass(self):
+        """
+        Method to derive a fitness value of a neural network
+        :return:
+        """
+        loss = 0
+        for point, target in zip(self.training_data.feature_vectors, self.testing_data.target_vector): # Iterate over training set
+            prediction = self.forward(point) # Get predicted value
+            actual = float(target) if not self.is_class else target # Get the actual value
+            loss += self.loss(actual, prediction) # Get loss function value
+        loss = loss / len(self.training_data.feature_vectors) # Average loss over training set
+
+        self.fitness = (1/loss) # Inverse the value to maximize fitness
 
     # unrolls the node object from the fnn and returns one array
     def unroll_nodes(self):

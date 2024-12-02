@@ -3,7 +3,7 @@ import random
 import math
 
 class GeneticAlgorithm:
-    def __init__(self, data, hold_out_fold, number_hidden_layers, hyperparameters,):
+    def __init__(self, data, hold_out_fold, number_hidden_layers, hyperparameters):
         self.population_size = hyperparameters['population_size']
         self.crossover_rate = hyperparameters['crossover_rate']
         self.mutation_rate = hyperparameters['mutation_rate']
@@ -107,11 +107,11 @@ class GeneticAlgorithm:
     def check_convergence(self):
         self.generation += 1
 
-        if self.generation > (self.population_size/2):
+        if self.generation < (self.population_size/2):
             pass
         else:
-            # TODO: write function to check convergence
-            self.converged = True
+            if self.generation >= 100:
+                self.converged = True
 
     def log_progress(self):
         best_fitness = max(member.fitness for member in self.population)
@@ -133,4 +133,28 @@ class GeneticAlgorithm:
         prediction, actual = most_fit.test()
 
         return prediction, actual
+
+# from root_data import *
+# def main():
+#     classification = "../data/soybean-small.data"
+#     regression = "../data/forestfires.data"
+#
+#     classification_data = RootData(path=classification, is_class=True)
+#     regression_data = RootData(path=regression, is_class=False)
+#
+#     hyperparameters = {
+#         'population_size': 10,
+#         'crossover_rate': 0.8,
+#         'mutation_rate': 0.1,
+#         'num_hidden_nodes': 2,
+#         'learning_rate': 0.01,
+#     }
+#
+#     classification_ga = GeneticAlgorithm(data=classification_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
+#     classification_ga.train()
+#     prediction, actual = classification_ga.test()
+#
+#     regression_ga = GeneticAlgorithm(data=regression_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
+#     regression_ga.train()
+#     prediction, actual = regression_ga.test()
 
