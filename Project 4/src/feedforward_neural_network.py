@@ -195,7 +195,7 @@ class FeedForwardNetwork:
         return loss_values
 
     def test(self):
-        predictions, actual = [], []
+        predictions, actuals = [], []
         for point in self.testing_data.feature_vectors:
             prediction = self.forward(point)
             # Get the index of the class with the highest probability
@@ -203,8 +203,8 @@ class FeedForwardNetwork:
             predicted_class = self.classes[predicted_class_index]  # Get the class label corresponding to that index
             actual = self.testing_data.target_vector[len(predictions)]  # Actual class label
             predictions.append(predicted_class)  # Append the predicted class label
-            actual.append(actual)  # Append the actual class label
-        return predictions, actual
+            actuals.append(actual)  # Append the actual class label
+        return predictions, actuals
     
 
     # unrolls the node object from the fnn and returns one array
@@ -246,7 +246,6 @@ class FeedForwardNetwork:
 
     def roll_up(self, node_list, edge_list):
         node_set = NodeSet()
-        edge_set = EdgeSet()
 
         # Input nodes
         input_layer = []
@@ -282,18 +281,3 @@ class FeedForwardNetwork:
         new_edges.import_edges(edge_list)
 
         self.edge_set = new_edges
-
-
-from root_data import *
-
-def main():
-    data = RootData('Project 4\data\soybean-small.data', True)
-
-    
-
-    ffn = FeedForwardNetwork(data=data, hold_out_fold=1, 
-                            number_hidden_layers=2, hyperparameters={'num_hidden_nodes': 5, 'learning_rate' : 0.01},
-                            _id=1)
-
-
-main()
