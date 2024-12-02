@@ -57,33 +57,56 @@ class GeneticAlgorithm:
         child = FeedForwardNetwork(self.data, self.hold_out_fold, self.number_hidden_layers, self.hyperparameters, self.current_id)
         self.current_id += 1
 
-        for parent_1_edge, parent_2_edge, child_edge in zip(self.current_parent_1.edge_set, self.current_parent_2.edge_set, child.edge_set):
+        for parent_1_edge, parent_2_edge, child_edge in zip(self.current_parent_1.edge_set.edges, self.current_parent_2.edge_set.edges, child.edge_set.edges):
             child_edge.weight = ((parent_1_edge.weight + parent_2_edge.weight) / 2)
 
-        for parent_1_node, parent_2_node, child_node in zip(self.current_parent_1.node_set, self.current_parent_2.node_set, child.node_set):
-            child_node.bias = ((parent_1_node.bais + parent_2_node.bias) / 2)
+        for parent_1_node, parent_2_node, child_node in zip(self.current_parent_1.node_set.input_layer, self.current_parent_2.node_set.input_layer, child.node_set.input_layer):
+            child_node.bias = ((parent_1_node.bias + parent_2_node.bias) / 2)
+
+        for p_1_layer, p_2_layer, c_later in zip(self.current_parent_1.node_set.hidden_layers, self.current_parent_2.node_set.hidden_layers, child.node_set.hidden_layers):
+            for parent_1_node, parent_2_node, child_node in zip(p_1_layer, p_2_layer, c_later):
+                child_node.bias = ((parent_1_node.bias + parent_2_node.bias) / 2)
+
+        for parent_1_node, parent_2_node, child_node in zip(self.current_parent_1.node_set.output_layer, self.current_parent_2.node_set.output_layer, child.node_set.output_layer):
+            child_node.bias = ((parent_1_node.bias + parent_2_node.bias) / 2)
 
         self.current_child = child
 
     def order_based_mutation(self):
-        number_of_edge_mutations = math.ceil(len(self.current_child.edge_set) * self.mutation_rate)
-        max_v = len(self.current_child.edge_set) - 1
+        number_of_edge_mutations = math.ceil(len(self.current_child.edge_set.edges) * self.mutation_rate)
+        max_v = len(self.current_child.edge_set.edges) - 1
         for i in range(number_of_edge_mutations):
-            edge_1 = self.current_child.edge_set[random.randint(0, max_v)]
-            edge_2 = self.current_child.edge_set[random.randint(0, max_v)]
+            edge_1 = self.current_child.edge_set.edges[random.randint(0, max_v)]
+            edge_2 = self.current_child.edge_set.edges[random.randint(0, max_v)]
 
             edge_1_weight = edge_1.weight
             edge_1.weight = edge_2.weight
             edge_2.weight = edge_1_weight
 
-        number_of_node_mutations = math.ceil(len(self.current_child.node_set) * self.mutation_rate)
-        max_v = len(self.current_child.node_set) - 1
-        for i in range(number_of_node_mutations):
-            node_1 = self.current_child.node_set[random.randint(0, max_v)]
-            node_2 = self.current_child.node_set[random.randint(0, max_v)]
+        num_nodes = len(self.current_child.node_set.input_layer) + (self.number_hidden_layers * self.hyperparameters['num_hidden_nodes']) + len(self.current_child.node_set.output_layer)
+        number_of_node_mutations = math.ceil(num_nodes * self.mutation_rate)
 
-            node_1_bias = node_1.bais
-            node_1.bias = node_2.bais
+        for i in range(number_of_node_mutations):
+            layer = random.randint(0, 2)
+            if layer == 0:
+                max_v = len(self.current_child.node_set.input_layer) - 1
+
+                node_1 = self.current_child.node_set.input_layer[random.randint(0, max_v)]
+                node_2 = self.current_child.node_set.input_layer[random.randint(0, max_v)]
+            elif layer == 1:
+                h_layer = random.randint(0, self.number_hidden_layers - 1)
+
+                max_v = len(self.current_child.node_set.hidden_layers[h_layer]) - 1
+                node_1 = self.current_child.node_set.hidden_layers[h_layer][random.randint(0, max_v)]
+                node_2 = self.current_child.node_set.hidden_layers[h_layer][random.randint(0, max_v)]
+            else:
+                max_v = len(self.current_child.node_set.output_layer) - 1
+
+                node_1 = self.current_child.node_set.output_layer[random.randint(0, max_v)]
+                node_2 = self.current_child.node_set.output_layer[random.randint(0, max_v)]
+
+            node_1_bias = node_1.bias
+            node_1.bias = node_2.bias
             node_2.bias = node_1_bias
 
     def read_state_replacement(self):
@@ -98,6 +121,7 @@ class GeneticAlgorithm:
 
         # Add the new child to the population
         self.population.append(self.current_child)
+        self.population.append(self.current_child)
         self.current_child.forward_pass() # Derive child's fitness value
 
         self.current_parent_1 = None
@@ -110,7 +134,7 @@ class GeneticAlgorithm:
         if self.generation < (self.population_size/2):
             pass
         else:
-            if self.generation >= 100:
+            if self.generation >= 1000:
                 self.converged = True
 
     def log_progress(self):
@@ -134,27 +158,31 @@ class GeneticAlgorithm:
 
         return prediction, actual
 
-# from root_data import *
-# def main():
-#     classification = "../data/soybean-small.data"
-#     regression = "../data/forestfires.data"
-#
-#     classification_data = RootData(path=classification, is_class=True)
-#     regression_data = RootData(path=regression, is_class=False)
-#
-#     hyperparameters = {
-#         'population_size': 10,
-#         'crossover_rate': 0.8,
-#         'mutation_rate': 0.1,
-#         'num_hidden_nodes': 2,
-#         'learning_rate': 0.01,
-#     }
-#
-#     classification_ga = GeneticAlgorithm(data=classification_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
-#     classification_ga.train()
-#     prediction, actual = classification_ga.test()
-#
-#     regression_ga = GeneticAlgorithm(data=regression_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
-#     regression_ga.train()
-#     prediction, actual = regression_ga.test()
+from root_data import *
+def main():
+    classification = "../data/soybean-small.data"
+    regression = "../data/forestfires.data"
+
+    classification_data = RootData(path=classification, is_class=True)
+    regression_data = RootData(path=regression, is_class=False)
+
+    hyperparameters = {
+        'population_size': 10,
+        'crossover_rate': 0.8,
+        'mutation_rate': 0.1,
+        'num_hidden_nodes': 2,
+        'learning_rate': 0.01,
+    }
+
+    classification_ga = GeneticAlgorithm(data=classification_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
+    classification_ga.train()
+    prediction, actual = classification_ga.test()
+
+    print('\n')
+
+    regression_ga = GeneticAlgorithm(data=regression_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
+    regression_ga.train()
+    prediction, actual = regression_ga.test()
+
+# main()
 
