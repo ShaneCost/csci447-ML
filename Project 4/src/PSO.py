@@ -9,49 +9,38 @@ class Patrical:
         self.network = network
         self.velocity = 0
 
-        self.previous_posistion = 0 #array of weight
-        self.posistion = network.unroll_edges() #array of Edge objects
-        
+        self.previous_posistion = [] #array of weight
+        self.posistion = network.unroll_edges() #array of Edge objects    
 
-        self.p_best = [] # personal best 
-        self.loss_p_best = max
+        self.p_best = [] # personal best posistion array
+        self.fitness_p_best =  0
 
-    def get_posistion(self):
+    # special handeling for posistion array
+
+    def get_posistion_array(self, array):
         posistion_array = []
-        for x in self.posistion:
+        for x in array:
             posistion_array.append(x.get_weight())
-    
-    # updates
-    def update_velocity(self, x):
-        self.velocity = x
-    
+        return posistion_array
+     
     def update_posistion(self, x):
-        network = self.netowrk
+        network = self.network
         for i, value in enumerate(x):
             self.posistion[i].update_weight(value)
 
         # update the network to reflect the new weights
         self.netowrk = network.roll_up(network.unroll_nodes(), self.posistion)
+      
     
-    def update_p_best(self, p):
-        self.p_best = p
-
-    def update_g_best(self, g):
-        self.g_best = g
+    def get_fitness(self):
+        self.network.forward_pass()
+        fitness = self.network.fitness
+        return fitness
     
-    def get_id(self):
-        return self._id    
-    
-    def get_loss(self):
-        total_loss = []
-        predictions, actuals = self.network.test()
-        for prediction, actual in zip(predictions, actuals):
-            loss = self.network.loss(prediction, actual)
-            total_loss.append(loss)
-
-        loss = np.mean(total_loss)
-        return loss
-
+    def print(self):
+        print("Posistion:", self.get_posistion_array(self.posistion)[:5])
+        print("Pbest:", self.get_posistion_array(self.p_best)[:5])
+        print("Velocity:", self.velocity)
 
 
 class PSO:
@@ -69,8 +58,9 @@ class PSO:
 
         self.population = []
 
-        self.g_best = [] # global best
-        self.loss_g_best = max
+        self.g_best_network = None
+        self.g_best = [] # global best posistion array
+        self.fitness_g_best = 0
         
         self.initialize_population()
     
@@ -87,14 +77,16 @@ class PSO:
             self.population.append(partical)
         self.current_id = _id + 1
 
-        # get fitness value of the population
-        self.update_p_best()
+  
+        self.update_p_best() # get fitness values of the population
+        self.find_update_g_best() # get the bestg fitness values from the population
         
+
 
     def update_velocity(self):
         for member in self.population:
             # Get the current position and velocity
-            X = member.posistion  # current position (unrolled weight matrix)
+            p = np.array(member.get_posistion_array(member.posistion))  # current position (unrolled weight matrix)
             v_old = member.velocity  # current velocity
 
             # Random values between 0 and 1
@@ -102,78 +94,102 @@ class PSO:
             r2 = random.random()
 
             # Personal best position (Pbest)
-            Pbest = member.p_best
+            Pbest = np.array(member.get_posistion_array(member.p_best))
 
             # Global best position (Gbest)
-            Gbest = self.get_global_best_position()
+            Gbest = np.array(member.get_posistion_array(self.g_best))
 
-            # Update the velocity
-            new_velocity = (self.inertia * v_old) + \
-                           (self.cognitive_update_rate * r1 * (Pbest - X)) + \
-                           (self.social_update_rate * r2 * (Gbest - X))
-
+            # Update velocity formula
+            new_velocity = (self.inertia) * v_old + (self.cognitive_update_rate) * r1 * (Pbest - p) + (self.social_update_rate) * r2 * (Gbest - p)
+            new_velocity = np.clip(new_velocity, 0, 1)
+            
             # Update the particle's velocity
-            member.update_velocity(new_velocity)
+            member.velocity = new_velocity
+
+
 
     def update_posisiton(self):
         for member in self.population:
                 # Get the current position and velocity
-                x = member.get_posistion()# current position (unrolled weight matrix)
-                y = member.previous_posistion
+                x = np.array(member.get_posistion_array(member.posistion))# current position (unrolled weight matrix)
+                y = np.array(member.previous_posistion)
                 v = member.velocity  # current velocity
 
-                new_position = np.array(y) + v(np.array(x))
+                if y.shape == (0,):
+                    new_position = v * (x)
+                else:
+                    new_position = (y) + v*(x)
 
                 member.previous_posistion = x
                 member.update_posistion(new_position)
 
+
     def update_p_best(self):
         for member in self.population:
-            loss =  member.get_loss()
-            if member.loss_p_best > loss:
-                member.loss_p_best = loss
+            fitness =  member.get_fitness()
+            if member.fitness_p_best < fitness:
+                member.fitness_p_best = fitness
                 member.p_best = member.posistion
-            
     
+            
     def find_update_g_best(self):
-        loss_g_best = self.loss_g_best
+        fitness_g_best = self.fitness_g_best
         g_best_posistion = self.g_best
 
         for member in self.population:
-            if loss_g_best > member.loss_p_best:
+            if fitness_g_best < member.fitness_p_best:
                 g_best_posistion = member.p_best
-                loss_g_best = member.loss_p_best
+                fitness_g_best = member.fitness_p_best
+                best_network = member.network
 
-        self.loss_g_best = loss_g_best
-        self.g_best = g_best_posistion
+                self.g_best_network = best_network
+                self.fitness_g_best = fitness_g_best
+                self.g_best = g_best_posistion
 
+
+    def convergance(self):
+        pass
 
     def train(self):
-        pass
-        
+        convergance = False
+        count = 0
+        while not convergance:
+            self.update_velocity()
+            self.update_posisiton()
+            self.update_p_best()
+
+            pre_g_best_fitness = self.fitness_g_best
+            self.find_update_g_best()
+
+            if (pre_g_best_fitness == self.fitness_g_best):
+                count+=1
+                if(count > 1000):
+                    convergance = True
+                    # print("Final Fitness"self.fitness_g_best)
+            else:
+                count = 0
+
+
     def test(self):
-        pass
+        prediction, actual = self.g_best_network.test()
+        return prediction, actual
 
 
 from root_data import *
 
 
-# class PSO:
-#     def __init__(self, data, hold_out_fold, number_hidden_layers, hyperparameters):
-
-#         self.population_size = hyperparameters['population_size']
-#         self.inertia = hyperparameters['inertia']
-#         self.cognitive_update_rate = hyperparameters['cognitive_update_rate']
-#         self.social_update_rate = hyperparameters["social_update_rate"]
-
 def main():
 
     data = RootData('Project 4\data\soybean-small.data', True)
-    hyperparameter = {'population_size': 5, 'inertia': 0.4, 'cognitive_update_rate': 1.4, 
-                      'social_update_rate': 1.4, 'num_hidden_nodes':5}
+    hyperparameter = {'population_size': 20, 'inertia': 0.4, 'cognitive_update_rate': 1.4, 
+                      'social_update_rate': 0.8, 'num_hidden_nodes':6}
 
     swarm = PSO(data=data, hold_out_fold=1, number_hidden_layers=1, hyperparameters=hyperparameter)
 
+    swarm.train()
+    prediction, actual = swarm.test()
 
+    print(prediction)
+    print(actual)
 
 main()

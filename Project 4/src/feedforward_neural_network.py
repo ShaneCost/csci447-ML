@@ -203,8 +203,8 @@ class FeedForwardNetwork:
             predicted_class = self.classes[predicted_class_index]  # Get the class label corresponding to that index
             actual = self.testing_data.target_vector[len(predictions)]  # Actual class label
             predictions.append(predicted_class)  # Append the predicted class label
-            actual.append(actual)  # Append the actual class label
-        return predictions, actual
+            actuals.append(actual)  # Append the actual class label
+        return predictions, actuals
 
     def forward_pass(self):
         """

@@ -138,10 +138,10 @@ class GeneticAlgorithm:
 # def main():
 #     classification = "../data/soybean-small.data"
 #     regression = "../data/forestfires.data"
-#
+
 #     classification_data = RootData(path=classification, is_class=True)
 #     regression_data = RootData(path=regression, is_class=False)
-#
+
 #     hyperparameters = {
 #         'population_size': 10,
 #         'crossover_rate': 0.8,
@@ -149,12 +149,13 @@ class GeneticAlgorithm:
 #         'num_hidden_nodes': 2,
 #         'learning_rate': 0.01,
 #     }
-#
+
 #     classification_ga = GeneticAlgorithm(data=classification_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
 #     classification_ga.train()
 #     prediction, actual = classification_ga.test()
-#
+
 #     regression_ga = GeneticAlgorithm(data=regression_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
 #     regression_ga.train()
 #     prediction, actual = regression_ga.test()
 
+# main()
