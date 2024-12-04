@@ -4,7 +4,7 @@ import numpy as np
 from confusion_matrix import *
 
 class Loss:
-    def __init__(self, actual, predicted, is_class=True):
+    def __init__(self, predicted, actual, is_class=True):
         """
         Class to implement the loss functions.
             Classification: Confusion Matrix

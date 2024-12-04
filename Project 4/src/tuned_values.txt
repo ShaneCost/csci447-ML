@@ -1,0 +1,281 @@
+breast-cancer-wisconsin
+
+	 0  hidden layers
+
+		GA population size:  5.0
+		crossover rate:  0.77
+		mutation rate:  0.11
+
+		DE population size:  68
+		scaling factor:  0.0
+		binomial crossover probability:  0.0
+
+		PSO population size:  15
+		inertia:  0.25
+		cognitive update rate:  0.93
+		social update rate:  0.57
+
+	 1  hidden layer
+
+		GA population size:  5.0
+		crossover rate:  0.11
+		mutation rate:  0.0
+
+		DE population size:  15
+		scaling factor:  1.0
+		binomial crossover probability:  0.66
+
+		PSO population size:  47
+		inertia:  0.56
+		cognitive update rate:  0.75
+		social update rate:  1.11
+
+	 2  hidden layers
+
+		GA population size:  5.0
+		crossover rate:  0.0
+		mutation rate:  0.0
+
+		DE population size:  5.0
+		scaling factor:  1.0
+		binomial crossover probability:  1.0
+
+		PSO population size:  70
+		inertia:  0.21
+		cognitive update rate:  0.87
+		social update rate:  1.15
+
+glass
+
+	 0  hidden layers
+
+		GA population size:  7.0
+		crossover rate:  0.56
+		mutation rate:  0.02
+
+		DE population size:  47
+		scaling factor:  0.0
+		binomial crossover probability:  0.0
+
+		PSO population size:  16
+		inertia:  0.31
+		cognitive update rate:  0.87
+		social update rate:  0.64
+
+	 1  hidden layer
+
+		GA population size:  5.0
+		crossover rate:  0.03
+		mutation rate:  0.01
+
+		DE population size:  17
+		scaling factor:  1.0
+		binomial crossover probability:  0.32
+
+		PSO population size:  34
+		inertia:  0.72
+		cognitive update rate:  0.47
+		social update rate:  1.13
+
+	 2  hidden layers
+
+		GA population size:  4.0
+		crossover rate:  0.01
+		mutation rate:  0.11
+
+		DE population size:  5.0
+		scaling factor:  1.0
+		binomial crossover probability:  1.0
+
+		PSO population size:  87
+		inertia:  0.91
+		cognitive update rate:  0.97
+		social update rate:  1.09
+
+soybean-small
+
+	 0  hidden layers
+
+		GA population size:  6.0
+		crossover rate:  0.76
+		mutation rate:  0.04
+
+		DE population size:  38
+		scaling factor:  0.05
+		binomial crossover probability:  0.07
+
+		PSO population size:  19
+		inertia:  0.39
+		cognitive update rate:  0.77
+		social update rate:  0.55
+
+	 1  hidden layer
+
+		GA population size:  5.0
+		crossover rate:  0.06
+		mutation rate:  0.11
+
+		DE population size:  13
+		scaling factor:  1.05
+		binomial crossover probability:  0.87
+
+		PSO population size:  43
+		inertia:  0.67
+		cognitive update rate:  0.38
+		social update rate:  1.01
+
+	 2  hidden layers
+
+		GA population size:  9.0
+		crossover rate:  0.17
+		mutation rate:  0.21
+
+		DE population size:  8.0
+		scaling factor:  0.9
+		binomial crossover probability:  0.87
+
+		PSO population size:  89
+		inertia:  0.76
+		cognitive update rate:  0.87
+		social update rate:  1.18
+
+forestfires
+
+	 0  hidden layers
+
+		GA population size:  15.0
+		crossover rate:  0.53
+		mutation rate:  0.0
+
+		DE population size:  71.0
+		scaling factor:  0.01
+		binomial crossover probability:  0.5
+
+		PSO population size:  10
+		inertia:  0.13
+		cognitive update rate:  0.78
+		social update rate:  0.46
+
+	 1  hidden layer
+
+		GA population size:  5.0
+		crossover rate:  0.05
+		mutation rate:  0.03
+
+		DE population size:  18
+		scaling factor:  1.0
+		binomial crossover probability:  0.33
+
+		PSO population size:  27
+		inertia:  0.89
+		cognitive update rate:  0.36
+		social update rate:  1.14
+
+	 2  hidden layers
+
+		GA population size:  8.0
+		crossover rate:  0.10
+		mutation rate:  0.14
+
+		DE population size:  6.0
+		scaling factor:  1.0
+		binomial crossover probability:  0.95
+
+		PSO population size:  7
+		inertia:  0.31
+		cognitive update rate:  0.18
+		social update rate:  .64
+
+machine
+
+	 0  hidden layers
+
+		GA population size:  18.0
+		crossover rate:  0.76
+		mutation rate:  0.09
+
+		DE population size:  99
+		scaling factor:  0.80
+		binomial crossover probability:  0.50
+
+		PSO population size:  5.0
+		inertia:  0.4
+		cognitive update rate:  0.94
+		social update rate:  0.31
+
+	 1  hidden layer
+
+		GA population size:  4.0
+		crossover rate:  0.56
+		mutation rate:  0.61
+
+		DE population size:  24
+		scaling factor:  1.0
+		binomial crossover probability:  1.0
+
+		PSO population size:  67
+		inertia:  0.72
+		cognitive update rate:  0.53
+		social update rate:  1.19
+
+	 2  hidden layers
+
+		GA population size:  11.0
+		crossover rate:  0.00
+		mutation rate:  0.00
+
+		DE population size:  59.0
+		scaling factor:  1.0
+		binomial crossover probability:  0.31
+
+		PSO population size:  91
+		inertia:  0.18
+		cognitive update rate:  0.73
+		social update rate:  1.90
+
+abalone
+
+	 0  hidden layers
+
+		GA population size:  7.0
+		crossover rate:  0.56
+		mutation rate:  0.02
+
+		DE population size:  47
+		scaling factor:  0.0
+		binomial crossover probability:  0.0
+
+		PSO population size:  16
+		inertia:  0.31
+		cognitive update rate:  0.87
+		social update rate:  0.64
+
+	 1  hidden layers
+
+		GA population size:  5.0
+		crossover rate:  0.03
+		mutation rate:  0.01
+
+		DE population size:  17
+		scaling factor:  1.0
+		binomial crossover probability:  0.32
+
+		PSO population size:  34
+		inertia:  0.72
+		cognitive update rate:  0.47
+		social update rate:  1.13
+
+	 2  hidden layers
+
+		GA population size:  4.0
+		crossover rate:  0.01
+		mutation rate:  0.11
+
+		DE population size:  5.0
+		scaling factor:  1.0
+		binomial crossover probability:  1.0
+
+		PSO population size:  87
+		inertia:  0.91
+		cognitive update rate:  0.97
+		social update rate:  1.09
