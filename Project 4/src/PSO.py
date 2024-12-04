@@ -150,9 +150,16 @@ class PSO:
     def convergance(self):
         pass
 
+    def log_progress(self):
+        best_fitness = max(member.fitness for member in self.population)
+        avg_fitness = sum(member.fitness for member in self.population) / len(self.population)
+        # print(f"Generation {self.generation}: Best Fitness = {best_fitness}, Avg Fitness = {avg_fitness}")
+        return avg_fitness
+
     def train(self):
         convergance = False
         count = 0
+        fitness_values = []
         while not convergance:
             self.update_velocity()
             self.update_posisiton()
@@ -163,11 +170,15 @@ class PSO:
 
             if (pre_g_best_fitness == self.fitness_g_best):
                 count+=1
-                if(count > 1000):
+                fitness_values.append(self.fitness_g_best)
+                if(count > 3000):
                     convergance = True
                     # print("Final Fitness"self.fitness_g_best)
             else:
                 count = 0
+
+        return fitness_values
+
 
 
     def test(self):
