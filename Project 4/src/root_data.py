@@ -71,7 +71,6 @@ class RootData:
         self.fold_9 = []
         self.fold_10 = []
 
-        # Dictionary used to store hyperparameters
         self.hyperparameters = {}
 
         self.load()

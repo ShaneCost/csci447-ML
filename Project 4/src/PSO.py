@@ -178,18 +178,18 @@ class PSO:
 from root_data import *
 
 
-def main():
-
-    data = RootData('Project 4\data\soybean-small.data', True)
-    hyperparameter = {'population_size': 20, 'inertia': 0.4, 'cognitive_update_rate': 1.4, 
-                      'social_update_rate': 0.8, 'num_hidden_nodes':6}
-
-    swarm = PSO(data=data, hold_out_fold=1, number_hidden_layers=1, hyperparameters=hyperparameter)
-
-    swarm.train()
-    prediction, actual = swarm.test()
-
-    print(prediction)
-    print(actual)
-
-main()
+# def main():
+#
+#     data = RootData('Project 4\data\soybean-small.data', True)
+#     hyperparameter = {'population_size': 20, 'inertia': 0.4, 'cognitive_update_rate': 1.4,
+#                       'social_update_rate': 0.8, 'num_hidden_nodes':6}
+#
+#     swarm = PSO(data=data, hold_out_fold=1, number_hidden_layers=1, hyperparameters=hyperparameter)
+#
+#     swarm.train()
+#     prediction, actual = swarm.test()
+#
+#     print(prediction)
+#     print(actual)
+#
+# # main()

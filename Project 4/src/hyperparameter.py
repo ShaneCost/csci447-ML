@@ -22,12 +22,12 @@ class Hyperparameter:
 
     def populate_dictionary(self):
         """
-        Populates the values_performance dictionary with 100 values between
+        Populates the values_performance dictionary with 50 values between
         min_value and max_value, where each key is one of the values and the
         corresponding value is set to 0 (indicating initial performance).
         """
         # Generate 100 values between min and max
-        values = np.linspace(self.min, self.max, 50)
+        values = np.linspace(self.min, self.max, 10)
 
         # Populate dictionary with each value as a key and performance set to 0
         self.values_performance = {value: 0 for value in values}
