@@ -1,3 +1,5 @@
+__author__ = "<Shane Costello>"
+
 from feedforward_neural_network import *
 import random
 import math
@@ -128,8 +130,6 @@ class GeneticAlgorithm:
         """
         Method used to perform the order based mutation
         """
-
-
         number_of_edge_mutations = math.ceil(len(self.current_child.edge_set.edges) * self.mutation_rate) # Calculate the number of mutations to perform
 
         if self.demo:
@@ -182,6 +182,9 @@ class GeneticAlgorithm:
             node_2.bias = node_1_bias
 
     def read_state_replacement(self):
+        """
+        Method to implement reading state replacement
+        """
         # Find the two least fit members
         sorted_population = sorted(self.population, key=lambda member: member.fitness)
         least_fit_1 = sorted_population[0]
@@ -201,6 +204,9 @@ class GeneticAlgorithm:
         self.current_child = None
 
     def check_convergence(self):
+        """
+        Method used to check the convergence of the algorithm
+        """
         self.generation += 1
 
         if self.generation < (self.population_size/2):

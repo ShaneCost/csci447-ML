@@ -1,3 +1,5 @@
+__author__ = "<Shane Costello>"
+
 from feedforward_neural_network import *
 import random
 from node import *

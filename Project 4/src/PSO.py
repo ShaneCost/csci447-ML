@@ -1,3 +1,5 @@
+__author__ = "<Hayden Perusich>"
+
 from feedforward_neural_network import *
 import random
 import math

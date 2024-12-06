@@ -10,18 +10,7 @@ import pandas as pd
 
 
 def read_csv_into_arrays_limited(csv_file, max_rows=3000):
-    """
-    Reads a CSV file and stores each column in an array (list).
-    Groups all those arrays inside another list.
-    Ignores the first line of the file and limits to the first max_rows rows.
 
-    Args:
-        csv_file (str): Path to the CSV file.
-        max_rows (int): Maximum number of rows to read (default: 3000).
-
-    Returns:
-        list of lists: Each inner list represents a column from the CSV file.
-    """
     # Load CSV file into a DataFrame, skipping the first row and limiting rows
     data = pd.read_csv(csv_file, skiprows=1, nrows=max_rows)
 
@@ -32,9 +21,7 @@ def read_csv_into_arrays_limited(csv_file, max_rows=3000):
 
 
 def plot_convergence(convergence, num_hidden_layers, chart_title, x_label, y_label, file_name, figure_num):
-    """
-    Generates a plot for convergence data.
-    """
+
     for i, fitness_values in enumerate(convergence):
         plt.plot(fitness_values, label=f'{num_hidden_layers[i]} Hidden Layers')
     plt.title(rf"$\bf{{Figure\ {figure_num}}}$: {chart_title}")
