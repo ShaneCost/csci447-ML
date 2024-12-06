@@ -1,3 +1,5 @@
+__author__ = "<Shane Costello>"
+
 import random
 from genetic_algorthim import *
 from differential_evolution import *

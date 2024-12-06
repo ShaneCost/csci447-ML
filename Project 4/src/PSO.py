@@ -1,3 +1,5 @@
+__author__ = "<Hayden Perusich>"
+
 from feedforward_neural_network import *
 import random
 import math
@@ -163,6 +165,7 @@ class PSO:
     def train(self, example=False):
         convergance = False
         count = 0
+        fitness_values = []
         while not convergance:
             self.update_velocity(example=example)
             self.update_posisiton(example=example)
@@ -173,11 +176,15 @@ class PSO:
 
             if (pre_g_best_fitness == self.fitness_g_best):
                 count+=1
-                if(count > 1000):
+                fitness_values.append(self.fitness_g_best)
+                if(count > 3000):
                     convergance = True
                     # print("Final Fitness"self.fitness_g_best)
             else:
                 count = 0
+
+        return fitness_values
+
 
 
     def test(self):
