@@ -83,7 +83,7 @@ class PSO:
         
 
 
-    def update_velocity(self):
+    def update_velocity(self, example=False):
         for member in self.population:
             # Get the current position and velocity
             p = np.array(member.get_posistion_array(member.posistion))  # current position (unrolled weight matrix)
@@ -106,9 +106,13 @@ class PSO:
             # Update the particle's velocity
             member.velocity = new_velocity
 
+            if(example and member._id == 0):
+                print(f"New calculated Velocity for 1st member is:")
+                print(f"{member.velocity [:5]}...{member.velocity [-5:]}")
 
 
-    def update_posisiton(self):
+
+    def update_posisiton(self, example=False):
         for member in self.population:
                 # Get the current position and velocity
                 x = np.array(member.get_posistion_array(member.posistion))# current position (unrolled weight matrix)
@@ -123,16 +127,23 @@ class PSO:
                 member.previous_posistion = x
                 member.update_posistion(new_position)
 
+                if(example and member._id == 0):
+                    print("New posistion for 1st member is:")
+                    print(f"{new_position [:5]}...{new_position [-5:]}")
 
-    def update_p_best(self):
+
+
+    def update_p_best(self, example=False):
         for member in self.population:
             fitness =  member.get_fitness()
             if member.fitness_p_best < fitness:
                 member.fitness_p_best = fitness
                 member.p_best = member.posistion
+                if (example and member._id == 0):
+                   print(f"Found new Pbest for first member. Fitness: {member.p_best}")
     
             
-    def find_update_g_best(self):
+    def find_update_g_best(self, example=False):
         fitness_g_best = self.fitness_g_best
         g_best_posistion = self.g_best
 
@@ -145,21 +156,20 @@ class PSO:
                 self.g_best_network = best_network
                 self.fitness_g_best = fitness_g_best
                 self.g_best = g_best_posistion
+                if(example):
+                    print(f"Found new Gbest. Fitness: {self.fitness_g_best}")
 
 
-    def convergance(self):
-        pass
-
-    def train(self):
+    def train(self, example=False):
         convergance = False
         count = 0
         while not convergance:
-            self.update_velocity()
-            self.update_posisiton()
-            self.update_p_best()
+            self.update_velocity(example=example)
+            self.update_posisiton(example=example)
+            self.update_p_best(example=example)
 
             pre_g_best_fitness = self.fitness_g_best
-            self.find_update_g_best()
+            self.find_update_g_best(example=example)
 
             if (pre_g_best_fitness == self.fitness_g_best):
                 count+=1

@@ -106,12 +106,14 @@ def requirement_3(data, hyperparameters):
     # CROSSOVER
     de.crossover()
 
-def requirement_4():
+def requirement_4(classification, hyperparameters):
     """"
     REQUIREMENT 4
     Demonstrate each of the main operations for the PSO: pbest calculation, gbest calculation, velocity
     update, and position update.
     """""
+    swarm = PSO(data=classification, hold_out_fold=1, number_hidden_layers=1, hyperparameters=hyperparameters)
+    swarm.train(example=True)
 
     # TODO: complete requirement_4()
 
@@ -242,8 +244,8 @@ def main():
         'social_update_rate': 0.5,
     }
 
-    classification = RootData("../data/soybean-small.data", is_class=True)
-    regression = RootData("../data/forestfires.data", is_class=False)
+    classification = RootData("Project 4/data/soybean-small.data", is_class=True)
+    regression = RootData("Project 4/data/forestfires.data", is_class=False)
 
     input('\nStart\n')
     # requirement_1(classification, regression, hyperparameters)

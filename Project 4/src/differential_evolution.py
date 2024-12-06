@@ -292,30 +292,30 @@ class DifferentialEvolution:
 
         return prediction, actual
 
-from root_data import *
-def main():
-    classification = "../data/soybean-small.data"
-    regression = "../data/forestfires.data"
+# from root_data import *
+# def main():
+#     classification = "../data/soybean-small.data"
+#     regression = "../data/forestfires.data"
 
-    classification_data = RootData(path=classification, is_class=True)
-    regression_data = RootData(path=regression, is_class=False)
+#     classification_data = RootData(path=classification, is_class=True)
+#     regression_data = RootData(path=regression, is_class=False)
 
-    hyperparameters = {
-        'population_size': 10,
-        'scaling_factor': 0.5,
-        'binomial_crossover_probability': 0.5,
-        'num_hidden_nodes': 2,
-        'learning_rate': 0.01,
-    }
+#     hyperparameters = {
+#         'population_size': 10,
+#         'scaling_factor': 0.5,
+#         'binomial_crossover_probability': 0.5,
+#         'num_hidden_nodes': 2,
+#         'learning_rate': 0.01,
+#     }
 
-    classification_ga = DifferentialEvolution(data=classification_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
-    classification_ga.train()
-    prediction, actual = classification_ga.test()
+#     classification_ga = DifferentialEvolution(data=classification_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
+#     classification_ga.train()
+#     prediction, actual = classification_ga.test()
 
-    print('\n')
+#     print('\n')
 
-    regression_ga = DifferentialEvolution(data=regression_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
-    regression_ga.train()
-    prediction, actual = regression_ga.test()
+#     regression_ga = DifferentialEvolution(data=regression_data, hold_out_fold=10, number_hidden_layers=1, hyperparameters=hyperparameters)
+#     regression_ga.train()
+#     prediction, actual = regression_ga.test()
 
 # main()
