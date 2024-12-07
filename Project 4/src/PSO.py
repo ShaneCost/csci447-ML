@@ -39,11 +39,6 @@ class Patrical:
         fitness = self.network.fitness
         return fitness
     
-    def print(self):
-        print("Posistion:", self.get_posistion_array(self.posistion)[:5])
-        print("Pbest:", self.get_posistion_array(self.p_best)[:5])
-        print("Velocity:", self.velocity)
-
 
 class PSO:
     def __init__(self, data, hold_out_fold, number_hidden_layers, hyperparameters):
@@ -109,6 +104,7 @@ class PSO:
             member.velocity = new_velocity
 
             if(example and member._id == 0):
+                example = False
                 print(f"New calculated Velocity for 1st member is:")
                 print(f"{member.velocity [:5]}...{member.velocity [-5:]}")
 
@@ -130,6 +126,7 @@ class PSO:
                 member.update_posistion(new_position)
 
                 if(example and member._id == 0):
+                    example = False
                     print("New posistion for 1st member is:")
                     print(f"{new_position [:5]}...{new_position [-5:]}")
 
@@ -141,8 +138,9 @@ class PSO:
             if member.fitness_p_best < fitness:
                 member.fitness_p_best = fitness
                 member.p_best = member.posistion
-                if (example and member._id == 0):
-                   print(f"Found new Pbest for first member. Fitness: {member.p_best}")
+            if (example and member._id == 0):
+                example = False
+                print(f"Found new Pbest for first member. Fitness: {member.fitness_p_best}")
     
             
     def find_update_g_best(self, example=False):
@@ -158,8 +156,10 @@ class PSO:
                 self.g_best_network = best_network
                 self.fitness_g_best = fitness_g_best
                 self.g_best = g_best_posistion
-                if(example):
-                    print(f"Found new Gbest. Fitness: {self.fitness_g_best}")
+
+        if(example):
+            example = False
+            print(f"Found new Gbest. Fitness: {self.fitness_g_best}")
 
 
     def train(self, example=False):
@@ -170,9 +170,9 @@ class PSO:
             self.update_velocity(example=example)
             self.update_posisiton(example=example)
             self.update_p_best(example=example)
-
             pre_g_best_fitness = self.fitness_g_best
             self.find_update_g_best(example=example)
+            example = False
 
             if (pre_g_best_fitness == self.fitness_g_best):
                 count+=1

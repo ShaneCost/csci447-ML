@@ -1,4 +1,4 @@
-__author__ = "<Shane Costello>"
+__author__ = "<Shane Costello>", "<Hayden Perusich>"
 
 from root_data import *
 from genetic_algorthim import *
@@ -6,6 +6,8 @@ from differential_evolution import *
 from PSO import *
 from feedforward_neural_network import *
 from loss import *
+import warnings
+
 
 def requirement_1(classification, regression, hyperparameters):
     """"
@@ -51,28 +53,28 @@ def requirement_1(classification, regression, hyperparameters):
     ga.train()
     predict, actual = ga.test()
     loss = Loss(predict, actual, is_class=False)
-    print("mse: ", loss.results)
+    print("mse: ", abs(loss.results))
 
     print("\nDifferential Evolution")
     de = DifferentialEvolution(data=regression, hold_out_fold=1, number_hidden_layers=2,hyperparameters=hyperparameters)
     de.train()
     predict, actual = de.test()
     loss = Loss(predict, actual, is_class=False)
-    print("mse: ", loss.results)
+    print("mse: ", abs(loss.results))
 
     print("\nParticle Swarm Optimization")
     pso = PSO(data=regression, hold_out_fold=1, number_hidden_layers=2, hyperparameters=hyperparameters)
     pso.train()
     predict, actual = pso.test()
-    loss = Loss(predict, actual, is_class=False)
-    print("mse: ", loss.results)
+    loss = Loss(actual, predict, is_class=False)
+    print("mse: ", abs(loss.results))
 
     print("\nBackpropagation")
     backprop = FeedForwardNetwork(data=regression, hold_out_fold=1, number_hidden_layers=2, hyperparameters=hyperparameters, _id=0)
     backprop.train()
     predict, actual = backprop.test()
-    loss = Loss(predict, actual, is_class=False)
-    print("mse: ", loss.results)
+    loss = Loss(actual, predict, is_class=False)
+    print("mse: ", abs(loss.results))
 
 def requirement_2(data, hyperparameters):
     """
@@ -117,7 +119,6 @@ def requirement_4(classification, hyperparameters):
     swarm = PSO(data=classification, hold_out_fold=1, number_hidden_layers=1, hyperparameters=hyperparameters)
     swarm.train(example=True)
 
-    # TODO: complete requirement_4()
 
 def requirement_5(classification, regression, hyperparameters):
     """"
@@ -232,9 +233,10 @@ def requirement_5(classification, regression, hyperparameters):
         print("mse: ", loss.results)
 
 def main():
+    warnings.filterwarnings("ignore")
 
     hyperparameters = {
-        'num_hidden_nodes': 2,
+        'num_hidden_nodes': 1,
         'learning_rate': 0.01,
         'population_size': 7,
         'crossover_rate': 0.8,
@@ -250,18 +252,18 @@ def main():
     regression = RootData("Project 4/data/forestfires.data", is_class=False)
 
     input('\nStart\n')
-    # requirement_1(classification, regression, hyperparameters)
+    requirement_1(classification, regression, hyperparameters)
 
-    input('\nContinue\n')
-    # requirement_2(classification, hyperparameters)
+    print("-----------------------------")
+    requirement_2(classification, hyperparameters)
 
-    input('\nContinue\n')
-    # requirement_3(classification, hyperparameters)
+    print("-----------------------------")
+    requirement_3(classification, hyperparameters)
 
-    input('\nContinue\n')
-    # requirement_4()
+    print("-----------------------------")
+    requirement_4(classification, hyperparameters)
 
-    input('\nContinue\n')
+    print("-----------------------------")
     requirement_5(classification, regression, hyperparameters)
 
 if __name__ == '__main__':

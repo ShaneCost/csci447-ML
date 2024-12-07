@@ -6,7 +6,7 @@ from node import NodeSet, Node
 from edge import EdgeSet, Edge
 from meta_data import *
 
-EPOCHS = 3000
+EPOCHS = 1000
 BATCH_SIZE = 32
 
 def tanh(x):
